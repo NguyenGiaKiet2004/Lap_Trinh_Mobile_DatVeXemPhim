@@ -3,7 +3,10 @@
     <string name="login_screen">Màn hình đăng nhập</string>
     <string name="Email">E-mail</string>
     <string name="passowrd">Nhập mật khẩu</string>
+    <string name="comfirm_passowrd">Nhập lại mật khẩu</string>
+    <string name="username">Nhập tên người dùng</string>
     <string name="login">Đăng Nhập</string>
     <string name="have_account">Bạn chưa có tài khoản?</string>
     <string name="register">Đăng ký</string>
+    <string name="dont_have_account">Bạn đã có tài khoản?</string>
 </resources>
