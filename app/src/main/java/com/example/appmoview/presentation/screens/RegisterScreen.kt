@@ -145,7 +145,7 @@ fun RegisterScreen() {
         OutlinedTextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password", color = colorScheme.onBackground) },
+            label = { Text(stringResource(id = R.string.comfirm_passowrd), color = colorScheme.onBackground) },
             singleLine = true,
             visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             trailingIcon = {
