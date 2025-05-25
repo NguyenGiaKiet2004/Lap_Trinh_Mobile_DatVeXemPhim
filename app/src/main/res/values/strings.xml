@@ -9,4 +9,9 @@
     <string name="have_account">Bạn chưa có tài khoản?</string>
     <string name="register">Đăng ký</string>
     <string name="dont_have_account">Bạn đã có tài khoản?</string>
+    <string name="dat_ve">ĐẶT VÉ</string>
+    <string name="cot_truyen">Cốt truyện</string>
+    <string name="ngon_ngu">Ngôn ngữ</string>
+    <string name="ngay_phat_hanh">Ngày phát hành</string>
+    <string name="thoi_luong">Thời lượng</string>
 </resources>

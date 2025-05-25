@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -92,15 +93,11 @@ fun MovieDetailScreen() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column {
-                        Text("Censor Rating", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                        Text("A", color = colorScheme.onSurface)
-                    }
-                    Column {
-                        Text("Thời lượng", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
+                        Text(stringResource(id = R.string.thoi_luong), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
                         Text("1hr:38min", color = colorScheme.onSurface)
                     }
                     Column {
-                        Text("Ngày phát hành", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
+                        Text(stringResource(id = R.string.ngay_phat_hanh), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
                         Text("21 April 2023", color = colorScheme.onSurface)
                     }
                 }
@@ -108,13 +105,13 @@ fun MovieDetailScreen() {
                 Spacer(modifier = Modifier.height(25.dp))
 
                 Column {
-                    Text("Ngôn ngữ", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
+                    Text(stringResource(id = R.string.ngon_ngu), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
                     Text("English", color = colorScheme.onSurface)
                 }
 
                 Spacer(modifier = Modifier.height(25.dp))
 
-                Text("Cốt chuyện", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
+                Text(stringResource(id = R.string.cot_truyen), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
                 Text(
                     "Evil Dead is a 2013 American supernatural horror film directed by Fede Álvarez...",
                     color = colorScheme.onSurface,
@@ -134,7 +131,7 @@ fun MovieDetailScreen() {
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("ĐẶT VÉ", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(id = R.string.dat_ve), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
         }
