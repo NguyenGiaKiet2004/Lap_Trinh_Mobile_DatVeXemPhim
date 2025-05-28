@@ -3,8 +3,13 @@ package com.example.appmoview
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import com.example.appmoview.presentation.screens.RegisterScreen
+import com.example.appmoview.presentation.screens.HomeScreen
+import com.example.appmoview.presentation.screens.HomeScreen1
+import com.example.appmoview.presentation.screens.InformationFilmScreen
 import com.example.appmoview.presentation.screens.BookingScreen
 import com.example.appmoview.presentation.screens.MovieDetailScreen
+
 import com.example.appmoview.presentation.theme.SystemTheme
 
 class MainActivity : AppCompatActivity() {
@@ -13,7 +18,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent{
             SystemTheme{
-                BookingScreen()
+                InformationFilmScreen()
+
             }
         }
 
