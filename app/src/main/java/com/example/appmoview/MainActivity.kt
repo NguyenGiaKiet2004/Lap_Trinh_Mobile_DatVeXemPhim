@@ -7,6 +7,9 @@ import com.example.appmoview.presentation.screens.RegisterScreen
 import com.example.appmoview.presentation.screens.HomeScreen
 import com.example.appmoview.presentation.screens.HomeScreen1
 import com.example.appmoview.presentation.screens.InformationFilmScreen
+import com.example.appmoview.presentation.screens.BookingScreen
+import com.example.appmoview.presentation.screens.MovieDetailScreen
+
 import com.example.appmoview.presentation.theme.SystemTheme
 
 class MainActivity : AppCompatActivity() {
@@ -16,6 +19,7 @@ class MainActivity : AppCompatActivity() {
         setContent{
             SystemTheme{
                 InformationFilmScreen()
+
             }
         }
 
