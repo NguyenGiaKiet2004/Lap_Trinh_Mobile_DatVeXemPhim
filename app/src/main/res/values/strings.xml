@@ -14,4 +14,7 @@
     <string name="ngon_ngu">Ngôn ngữ</string>
     <string name="ngay_phat_hanh">Ngày phát hành</string>
     <string name="thoi_luong">Thời lượng</string>
+    <string name="the_loai">Thể loại</string>
+    <string name="id_phim">id</string>
+    <string name="gio_chieu">Giờ chiếu</string>
 </resources>

@@ -102,5 +102,4 @@ dependencies {
     implementation(libs.androidx.runtime.rxjava2)
 
 
-
 }

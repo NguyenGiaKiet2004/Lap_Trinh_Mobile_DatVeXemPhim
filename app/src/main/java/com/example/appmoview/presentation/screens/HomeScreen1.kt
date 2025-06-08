@@ -1,6 +1,14 @@
 package com.example.appmoview.presentation.screens
 
 import android.R.attr.contentDescription
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -17,6 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -29,6 +39,11 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,6 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.appmoview.R
+import kotlinx.coroutines.delay
 
 @Composable
 fun HomeScreen1() {
@@ -53,11 +69,14 @@ fun HomeScreen1() {
                 .fillMaxSize()
                 .padding(paddingValues) // Thêm padding từ Scaffold để tránh bị đè
         ) {
+
             TimKiem()
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
             ) {
                 item {
+                    //SlideShow()
                     PhimHot()
                 }
                 item {
@@ -93,11 +112,14 @@ fun TimKiem(){
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
-            IconButton(onClick = {}){
+            IconButton(onClick = {},
+                modifier = Modifier
+                    .background(Color.DarkGray, shape = RoundedCornerShape(25.dp)),
+                ){
                 Icon(
                     imageVector = Icons.Default.Search, // Sử dụng biểu tượng tìm kiếm mặc định
                     contentDescription = "Search",
-                    tint = Color.White // Màu của biểu tượng
+                    tint = Color.White, // Màu của biểu tượng
                 )
             }
         }
@@ -160,7 +182,7 @@ fun PhimTheoTheLoai(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 20.dp)
-            .background(color = Color.DarkGray),
+            .background(color = Color(0xFF2C2C2C)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
 
@@ -289,6 +311,50 @@ fun BottomNavigationBar1() {
         )
     }
 }
+
+/*@Composable
+fun SlideShow() {
+    val images = listOf(
+        R.drawable.ps1, // Thay bằng ID tài nguyên ảnh
+        R.drawable. ps1,
+        R.drawable.phim2
+    )
+
+    val pagerState = rememberPagerState(pageCount = { images.size })
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(3000) // Trượt sau mỗi 3 giây
+            pagerState.animateScrollToPage((pagerState.currentPage + 1) % images.size)
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        HorizontalPager(state = pagerState) { page ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .padding(horizontal = 8.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color.LightGray)
+            ) {
+                Image(
+                    painter = painterResource(id = images[page]),
+                    contentDescription = "Slide image $page",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+        }
+
+    }
+}*/
 
 
 
