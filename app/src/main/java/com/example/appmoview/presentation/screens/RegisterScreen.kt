@@ -1,5 +1,6 @@
 package com.example.appmoview.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,12 +27,15 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -39,11 +43,19 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.appmoview.R
+import com.example.appmoview.domain.model.RegisterRequest
+import com.example.appmoview.presentation.viewmodels.AuthViewModel
 
 @Composable
 fun RegisterScreen() {
+    val context = LocalContext.current
+    val authViewModel: AuthViewModel = viewModel()
+    val registerStatus by authViewModel.registerStatus.observeAsState()
     val colorScheme = MaterialTheme.colorScheme
+    var isLoading by remember { mutableStateOf(false) }
+
 
     var username by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
@@ -173,7 +185,16 @@ fun RegisterScreen() {
 
         // Register Button
         Button(
-            onClick = {  },
+            onClick = {
+                isLoading = true
+                val request = RegisterRequest(
+                    username = username,
+                    email = email,
+                    password = password,
+                    role_id = 2
+                )
+                authViewModel.register(request)
+            },
             colors = ButtonDefaults.buttonColors(
                 containerColor = colorScheme.primary,
                 contentColor = colorScheme.onPrimary
@@ -190,6 +211,19 @@ fun RegisterScreen() {
                 fontWeight = FontWeight.Bold
             )
         }
+
+        // Khi đăng ký thành công → quay về login
+        LaunchedEffect(registerStatus) {
+            registerStatus?.let { response ->
+                isLoading = false
+                if (response.success) {
+                    Toast.makeText(context, "Đăng ký thành công", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Đăng ký thất bại", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+
 
         Spacer(modifier = Modifier.height(25.dp))
 
@@ -211,5 +245,13 @@ fun RegisterScreen() {
                 modifier = Modifier.clickable { }
             )
         }
+
+        if (isLoading) {
+            androidx.compose.material3.CircularProgressIndicator(
+                color = colorScheme.primary,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+
     }
 }

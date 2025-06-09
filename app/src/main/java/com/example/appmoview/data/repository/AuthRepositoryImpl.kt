@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.appmoview.data.source.retrofit.RetrofitClient
 import com.example.appmoview.domain.model.LoginRequest
+import com.example.appmoview.domain.model.RegisterRequest
+import com.example.appmoview.domain.model.ResponseData
 import com.example.appmoview.domain.serviceInterface.AuthRepository
 import okhttp3.ResponseBody
 import org.json.JSONObject
@@ -18,6 +20,9 @@ class AuthRepositoryImpl(private val context: Context) : AuthRepository {
 
     private val _loginStatus = MutableLiveData<Boolean>()
     val loginStatus: LiveData<Boolean> get() = _loginStatus
+
+    private val _registerStatus = MutableLiveData<ResponseData>()
+    val registerStatus: LiveData<ResponseData> get() = _registerStatus
 
     override fun loginUser(user: LoginRequest) {
         RetrofitClient.instance.login(user).enqueue(object : Callback<ResponseBody> {
@@ -47,6 +52,22 @@ class AuthRepositoryImpl(private val context: Context) : AuthRepository {
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 Log.e("LoginRepository", "Network request failed", t)
                 _loginStatus.value = false
+            }
+        })
+    }
+
+    override fun registerUser(request: RegisterRequest) {
+        RetrofitClient.instance.registerUser(request).enqueue(object : Callback<ResponseData> {
+            override fun onResponse(call: Call<ResponseData>, response: Response<ResponseData>) {
+                if (response.isSuccessful) {
+                    _registerStatus.value = response.body()
+                } else {
+                    _registerStatus.value = ResponseData(false, "Đăng ký thất bại")
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseData>, t: Throwable) {
+                _registerStatus.value = ResponseData(false, t.message ?: "Lỗi kết nối")
             }
         })
     }

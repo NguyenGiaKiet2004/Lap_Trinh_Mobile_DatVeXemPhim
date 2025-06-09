@@ -8,7 +8,7 @@ object RetrofitClient {
 
 
     // sửa địa chỉ ip hiện tại của máy
-    private const val BASE_URL = "http://192.168.1.24:8080/DataTest/"
+    private const val BASE_URL = "http://192.168.1.29:8080/"
 
     fun getBaseUrl(): String { return BASE_URL}
 

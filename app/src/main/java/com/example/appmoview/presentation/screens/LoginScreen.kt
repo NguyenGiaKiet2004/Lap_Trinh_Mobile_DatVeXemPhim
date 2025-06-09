@@ -32,6 +32,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -39,10 +40,14 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.appmoview.R
+import com.example.appmoview.presentation.viewmodels.AuthViewModel
 
 @Composable
 fun LoginScreen() {
+    val context = LocalContext.current
+    val authViewModel: AuthViewModel = viewModel()
     val colorScheme = MaterialTheme.colorScheme
 
     var email by remember { mutableStateOf("") }
