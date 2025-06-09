@@ -102,4 +102,5 @@ dependencies {
     implementation(libs.androidx.runtime.rxjava2)
 
 
+    implementation("io.coil-kt:coil-compose:2.5.0")
 }
