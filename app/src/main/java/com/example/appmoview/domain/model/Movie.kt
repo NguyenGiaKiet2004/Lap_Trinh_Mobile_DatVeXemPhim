@@ -1,4 +1,4 @@
-package com.example.appmoview.presentation.viewmodels
+package com.example.appmoview.domain.model
 
 data class Movie(
     val title: String,

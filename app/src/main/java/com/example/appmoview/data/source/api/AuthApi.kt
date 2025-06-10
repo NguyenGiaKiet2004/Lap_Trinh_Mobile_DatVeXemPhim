@@ -13,8 +13,8 @@ import retrofit2.http.POST
 
 interface AuthApi {
 
-    @POST("login") // Đường dẫn API PHP của bạn
-    fun login(@Body request: LoginRequest): Call<ResponseBody>
+    @POST("login/sign_up") // Đường dẫn API PHP của bạn
+    fun login(@Body request: LoginRequest): Call<ResponseData>
 
     @POST("login/register")
     fun registerUser(@Body request: RegisterRequest): Call<ResponseData>
