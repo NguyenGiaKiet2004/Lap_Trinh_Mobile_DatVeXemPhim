@@ -44,12 +44,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.appmoview.R
 import com.example.appmoview.domain.model.RegisterRequest
 import com.example.appmoview.presentation.viewmodels.AuthViewModel
 
 @Composable
-fun RegisterScreen() {
+fun RegisterScreen(navController: NavController) {
     val context = LocalContext.current
     val authViewModel: AuthViewModel = viewModel()
     val registerStatus by authViewModel.registerStatus.observeAsState()
@@ -184,7 +185,13 @@ fun RegisterScreen() {
         )
 
         // Register Button
-        Button(
+        if (isLoading) {
+            androidx.compose.material3.CircularProgressIndicator(
+                color = colorScheme.primary,
+                modifier = Modifier.padding(top = 16.dp)
+            )
+        }
+        else Button(
             onClick = {
                 isLoading = true
                 val request = RegisterRequest(
@@ -218,6 +225,9 @@ fun RegisterScreen() {
                 isLoading = false
                 if (response.success) {
                     Toast.makeText(context, "Đăng ký thành công", Toast.LENGTH_SHORT).show()
+                    navController.navigate("login") {
+                        popUpTo("register") { inclusive = true }
+                    }
                 } else {
                     Toast.makeText(context, "Đăng ký thất bại", Toast.LENGTH_SHORT).show()
                 }
@@ -242,16 +252,15 @@ fun RegisterScreen() {
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.onBackground,
-                modifier = Modifier.clickable { }
+                modifier = Modifier.clickable {
+                    navController.navigate("login") {
+                        popUpTo("register") { inclusive = true }
+                    }
+                }
             )
         }
 
-        if (isLoading) {
-            androidx.compose.material3.CircularProgressIndicator(
-                color = colorScheme.primary,
-                modifier = Modifier.padding(top = 16.dp)
-            )
-        }
+
 
     }
 }

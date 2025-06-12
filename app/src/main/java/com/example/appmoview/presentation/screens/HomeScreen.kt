@@ -23,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight // Để định nghĩa độ đ
 import androidx.compose.ui.tooling.preview.Preview // Để xem trước Composable trong Android Studio
 import androidx.compose.ui.unit.dp // Đơn vị mật độ điểm ảnh (Density-independent Pixels)
 import androidx.compose.ui.unit.sp // Đơn vị kích thước văn bản (Scale-independent Pixels)
+import androidx.navigation.NavController
 import com.example.appmoview.R
 // --- 1. Data Models (Mô hình dữ liệu) ---
 // Đây là các lớp dữ liệu đơn giản để đại diện cho thông tin chúng ta sẽ hiển thị.
@@ -45,7 +46,7 @@ data class Section(
 // Nó sử dụng Scaffold để cấu trúc màn hình với Top Bar, Bottom Bar và Content.
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavController) {
     Scaffold(
         // topBar: Phần trên cùng của màn hình (App Bar)
         topBar = {

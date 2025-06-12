@@ -1,5 +1,6 @@
 package com.example.appmoview.presentation.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,7 +27,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -41,18 +44,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.example.appmoview.R
+import com.example.appmoview.domain.model.LoginRequest
 import com.example.appmoview.presentation.viewmodels.AuthViewModel
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController) {
     val context = LocalContext.current
     val authViewModel: AuthViewModel = viewModel()
+    val loginStatus by authViewModel.loginStatus.observeAsState()
     val colorScheme = MaterialTheme.colorScheme
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -122,27 +129,55 @@ fun LoginScreen() {
             )
         )
 
-        // Login Button
-        Button(
-            onClick = { },
-            colors = ButtonDefaults.buttonColors(
-                containerColor = colorScheme.primary,
-                contentColor = colorScheme.onPrimary
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 30.dp)
-                .height(50.dp),
-            shape = RoundedCornerShape(16.dp)
-        ) {
-            Text(
-                text = stringResource(id = R.string.login),
-                fontSize = 17.sp,
-                fontWeight = FontWeight.Bold
+        // Login Button or Loading Spinner
+        if (isLoading) {
+            androidx.compose.material3.CircularProgressIndicator(
+                color = colorScheme.primary,
+                modifier = Modifier
+                    .padding(top = 30.dp)
+                    .height(50.dp)
             )
+        } else {
+            Button(
+                onClick = {
+                    val user = LoginRequest(email, password)
+                    isLoading = true
+                    authViewModel.loginUser(user)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = colorScheme.primary,
+                    contentColor = colorScheme.onPrimary
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 30.dp)
+                    .height(50.dp),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text(
+                    text = stringResource(id = R.string.login),
+                    fontSize = 17.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(35.dp))
+
+        LaunchedEffect(loginStatus) {
+            loginStatus?.let {
+                isLoading = false // Tắt loading khi có kết quả
+
+                if (it) {
+                    Toast.makeText(context, "Đăng nhập thành công", Toast.LENGTH_SHORT).show()
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                } else {
+                    Toast.makeText(context, "Đăng nhập thất bại", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
 
         // Register row
         Row(
@@ -159,9 +194,14 @@ fun LoginScreen() {
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = colorScheme.onBackground,
-                modifier = Modifier.clickable { }
+                modifier = Modifier.clickable {
+                    navController.navigate("register") {
+                        popUpTo("login") { inclusive = true }
+                    }
+                }
             )
         }
     }
 }
+
 

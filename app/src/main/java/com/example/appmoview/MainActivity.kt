@@ -1,19 +1,14 @@
 package com.example.appmoview
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.Composable
-import com.example.appmoview.presentation.screens.AccountScreen
+import androidx.navigation.compose.rememberNavController
+import com.example.appmoview.presentation.navigation.AppNavigation
 import com.example.appmoview.presentation.screens.RegisterScreen
-import com.example.appmoview.presentation.screens.HomeScreen
-import com.example.appmoview.presentation.screens.HomeScreen1
-import com.example.appmoview.presentation.screens.BookingScreen
-import com.example.appmoview.presentation.screens.ListTickerScreen
-import com.example.appmoview.presentation.screens.MovieDetailScreen
-import com.example.appmoview.presentation.screens.MovieSearchScreen
-
 import com.example.appmoview.presentation.theme.SystemTheme
+import com.example.appmoview.utils.logout
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,9 +16,15 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContent{
             SystemTheme{
-                RegisterScreen()
+                val navController = rememberNavController()
+                AppNavigation(navController = navController)
             }
         }
-
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        logout(this)
+    }
+
 }
