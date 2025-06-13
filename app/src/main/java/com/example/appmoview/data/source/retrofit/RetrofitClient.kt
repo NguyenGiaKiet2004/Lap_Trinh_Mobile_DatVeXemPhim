@@ -23,7 +23,6 @@ object RetrofitClient {
     val api: MovieApi by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(MovieApi::class.java)

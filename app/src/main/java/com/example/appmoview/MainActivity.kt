@@ -1,5 +1,6 @@
 package com.example.appmoview
 
+import ShowAllFilm
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -17,7 +18,8 @@ class MainActivity : AppCompatActivity() {
         setContent{
             SystemTheme{
                 val navController = rememberNavController()
-                AppNavigation(navController = navController)
+                //AppNavigation(navController = navController)
+                ShowAllFilm()
             }
         }
     }
