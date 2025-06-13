@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "982296044793",
+    "project_id": "btvn1-lttbdd-b5",
+    "storage_bucket": "btvn1-lttbdd-b5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:982296044793:android:f4dde143bf5daa7139ae28",
+        "android_client_info": {
+          "package_name": "com.example.btvn3_lttbdd_b4"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4JVXfwTHDAlq6D9HFAghIo8QsLVLHdJE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

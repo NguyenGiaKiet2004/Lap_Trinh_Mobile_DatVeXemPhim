@@ -35,6 +35,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.Navigator
 import com.example.appmoview.R
 /*
 @Composable
@@ -163,7 +165,7 @@ fun SearchScreen() {
 
 */
 @Composable
-fun MovieSearchScreen() {
+fun SearchScreen(navController: NavController) {
     var query by remember { mutableStateOf("") }
 
     val recentSearch = listOf("Salaar", "Flash", "Aquaman 2")

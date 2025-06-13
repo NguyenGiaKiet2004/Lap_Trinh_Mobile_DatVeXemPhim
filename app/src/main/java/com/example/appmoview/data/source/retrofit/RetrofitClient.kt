@@ -1,6 +1,7 @@
 package com.example.appmoview.data.source.retrofit
 
 import com.example.appmoview.data.source.api.AuthApi
+import com.example.appmoview.data.source.api.MovieApi
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -18,6 +19,14 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(AuthApi::class.java)
+    }
+    val api: MovieApi by lazy {
+        Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(MovieApi::class.java)
     }
 
 }

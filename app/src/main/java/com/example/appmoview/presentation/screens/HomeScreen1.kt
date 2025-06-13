@@ -53,11 +53,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.appmoview.R
 import kotlinx.coroutines.delay
 
 @Composable
-fun HomeScreen1() {
+fun HomeScreen1(navController: NavController) {
     androidx.compose.material.Scaffold(
         backgroundColor = Color.Black,
         bottomBar = {
