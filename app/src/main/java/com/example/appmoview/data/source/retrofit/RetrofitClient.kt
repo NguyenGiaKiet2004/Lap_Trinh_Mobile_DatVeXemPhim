@@ -9,7 +9,7 @@ object RetrofitClient {
 
 
     // sửa địa chỉ ip hiện tại của máy
-    private const val BASE_URL = "http://192.168.198.11:8080/"
+    private const val BASE_URL = "http://192.168.1.22:8080/"
 
     fun getBaseUrl(): String { return BASE_URL}
 
@@ -20,10 +20,10 @@ object RetrofitClient {
             .build()
             .create(AuthApi::class.java)
     }
-    val api: MovieApi by lazy {
+
+    val movieInstance: MovieApi by lazy {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
-            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(MovieApi::class.java)

@@ -1,21 +1,10 @@
 package com.example.appmoview.presentation.screens
 
-import android.R.attr.contentDescription
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,15 +14,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -41,9 +29,10 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,12 +42,29 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.example.appmoview.R
-import kotlinx.coroutines.delay
+import com.example.appmoview.domain.model.MovieRequest
+import com.example.appmoview.presentation.viewmodels.MovieViewModel
+import com.example.appmoview.utils.ImageHelper
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+
 
 @Composable
 fun HomeScreen1(navController: NavController) {
+
+    val viewModel: MovieViewModel = viewModel()
+    val isLoading by viewModel.isLoading.observeAsState(true)
+    val movies by viewModel.movieList.observeAsState(emptyList())
+
+    // Load dữ liệu khi màn hình được hiển thị lần đầu
+    LaunchedEffect(Unit) {
+        viewModel.loadMovies()
+    }
+
     androidx.compose.material.Scaffold(
         backgroundColor = Color.Black,
         bottomBar = {
@@ -77,8 +83,11 @@ fun HomeScreen1(navController: NavController) {
                 modifier = Modifier.fillMaxSize()
             ) {
                 item {
-                    //SlideShow()
-                    PhimHot()
+                    if (isLoading) {
+                        PhimHotSkeleton()
+                    } else {
+                        PhimHot(movies)
+                    }
                 }
                 item {
                     PhimTheoTheLoai("Phim hành động", R.drawable.phim2, "Pushpa-2", "Adventure", "180 phút")
@@ -127,49 +136,125 @@ fun TimKiem(){
     }
 
 @Composable
-fun PhimHot(){
+fun PhimHot(movies: List<MovieRequest>) {
+    val listState = rememberLazyListState()
+
+    var centerItemIndex by remember { mutableStateOf(0) }
+
+    // Theo dõi vị trí scroll để tính item giữa
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            listState.firstVisibleItemIndex to listState.firstVisibleItemScrollOffset
+        }.collect { (index, offset) ->
+            val offsetItem = if (offset > 100) 1 else 0
+            centerItemIndex = (index + offsetItem).coerceIn(0, movies.lastIndex)
+        }
+    }
+
     Column(
-        modifier= Modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(top = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(16.dp), // Các item cách nhau 16dp
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 0.dp), // Padding cho nội dung của LazyRow
+            state = listState,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
         ) {
-            items(3) {
+            items(movies.size) { index ->
+                val movie = movies[index]
                 Column(
                     modifier = Modifier
                         .height(300.dp)
                         .width(200.dp)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.ps1),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop, // Cắt hình ảnh để lấp đầy không gian modifier = Modifier
+                        painter = rememberAsyncImagePainter(
+                            model = ImageHelper.getMovieImageUrl(movie.movie_picture)
+                        ),
+                        contentDescription = movie.movie_name,
+                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .fillMaxWidth() // Chiếm toàn bộ chiều rộng của Column
-                            .weight(1f) // Chiếm phần còn lại của chiều cao của Column
-                            .clip(RoundedCornerShape(12.dp))// Bo tròn góc hình ảnh
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
                     )
                 }
             }
         }
+
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = "Pushpa-2",
-            fontSize = 20.sp,
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(horizontal = 16.dp)
+
+        if (movies.isNotEmpty()) {
+            val movie = movies[centerItemIndex]
+            Text(
+                text = movie.movie_name,
+                fontSize = 20.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(horizontal = 16.dp)
             )
-        Text(
-            text = "Adventure",
-            color = Color.LightGray
+            Text(
+                text = "${movie.movie_time} phút",
+                color = Color.LightGray
+            )
+        }
+    }
+}
+
+
+@Composable
+fun PhimHotSkeleton() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp),
+        ) {
+            items(5) {
+                Column(
+                    modifier = Modifier
+                        .height(300.dp)
+                        .width(200.dp)
+                ) {
+                    // Khối giả hình ảnh
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1f)
+                            .clip(RoundedCornerShape(12.dp))
+                            .background(Color.Gray.copy(alpha = 0.3f))
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Khối giả tên phim
+        Spacer(
+            modifier = Modifier
+                .height(20.dp)
+                .width(150.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(Color.Gray.copy(alpha = 0.3f))
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(
+            modifier = Modifier
+                .height(16.dp)
+                .width(100.dp)
+                .clip(RoundedCornerShape(4.dp))
+                .background(Color.Gray.copy(alpha = 0.3f))
         )
     }
 }
+
 
 @Composable
 fun PhimTheoTheLoai(
