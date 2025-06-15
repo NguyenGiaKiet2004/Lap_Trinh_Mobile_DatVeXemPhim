@@ -40,4 +40,27 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
             }
         })
     }
+
+    override fun fetchMovieById(id: Int, onResult: (MovieRequest?) -> Unit) {
+        _isLoading.value = true
+
+        RetrofitClient.movieInstance.getMovieById(id).enqueue(object : Callback<MovieRequest> {
+            override fun onResponse(call: Call<MovieRequest>, response: Response<MovieRequest>) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    onResult(response.body())
+                } else {
+                    _errorMessage.value = "Không thể tải phim (${response.code()})"
+                    onResult(null)
+                }
+            }
+
+            override fun onFailure(call: Call<MovieRequest>, t: Throwable) {
+                _isLoading.value = false
+                _errorMessage.value = "Lỗi kết nối: ${t.localizedMessage}"
+                onResult(null)
+            }
+        })
+    }
+
 }

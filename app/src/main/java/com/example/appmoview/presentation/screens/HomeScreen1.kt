@@ -2,6 +2,7 @@ package com.example.appmoview.presentation.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,20 +19,21 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,8 +52,8 @@ import com.example.appmoview.R
 import com.example.appmoview.domain.model.MovieRequest
 import com.example.appmoview.presentation.viewmodels.MovieViewModel
 import com.example.appmoview.utils.ImageHelper
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import com.example.appmoview.utils.getActMovie
+import com.example.appmoview.utils.getAnimeMovie
 
 
 @Composable
@@ -86,17 +89,24 @@ fun HomeScreen1(navController: NavController) {
                     if (isLoading) {
                         PhimHotSkeleton()
                     } else {
-                        PhimHot(movies)
+                        PhimHot(movies
+                            .sortedByDescending { it.movie_id } // Sắp xếp giảm dần theo id
+                            .take(3),navController)
                     }
                 }
                 item {
-                    PhimTheoTheLoai("Phim hành động", R.drawable.phim2, "Pushpa-2", "Adventure", "180 phút")
+                    if (isLoading) {
+                        PhimTheoTheLoaiSkeleton("Phim hành động")
+                    } else {
+                        PhimTheoTheLoai("Phim hành động", getActMovie(movies),navController)
+                    }
                 }
-                item{
-                    PhimTheoTheLoai("Phim Anime", R.drawable.phim2, "One Piece", "Shounen", "24 phút")
-                }
-                item{
-                    PhimTheoTheLoai("Phim Cổ Trang", R.drawable.phim2, "Tam Quốc", "Cổ trang", "120 phút")
+                item {
+                    if (isLoading) {
+                        PhimTheoTheLoaiSkeleton("Phim hoạt hình")
+                    } else {
+                        PhimTheoTheLoai("Phim hoạt hình", getAnimeMovie(movies),navController)
+                    }
                 }
             }
         }
@@ -136,7 +146,7 @@ fun TimKiem(){
     }
 
 @Composable
-fun PhimHot(movies: List<MovieRequest>) {
+fun PhimHot(movies: List<MovieRequest>, navController: NavController) {
     val listState = rememberLazyListState()
 
     var centerItemIndex by remember { mutableStateOf(0) }
@@ -168,6 +178,9 @@ fun PhimHot(movies: List<MovieRequest>) {
                     modifier = Modifier
                         .height(300.dp)
                         .width(200.dp)
+                        .clickable {
+                            navController.navigate("detail/${movie.movie_id}")
+                        }
                 ) {
                     Image(
                         painter = rememberAsyncImagePainter(
@@ -259,10 +272,8 @@ fun PhimHotSkeleton() {
 @Composable
 fun PhimTheoTheLoai(
     tieuDe: String,
-    anhResId: Int,
-    tenPhim: String,
-    theLoai: String,
-    thoiLuong: String
+    movies: List<MovieRequest>,
+    navController: NavController
 ) {
     Column(
         modifier = Modifier
@@ -271,7 +282,6 @@ fun PhimTheoTheLoai(
             .background(color = Color(0xFF2C2C2C)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-
         Row(
             modifier = Modifier
                 .padding(top = 5.dp)
@@ -286,10 +296,88 @@ fun PhimTheoTheLoai(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 10.dp)
             )
-            TextButton(onClick = {}) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+            TextButton(onClick = { /* TODO: Xử lý khi nhấn "Xem tất cả" */ }) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "Xem tất cả", color = Color.Yellow)
+                    Icon(
+                        painter = painterResource(id = R.drawable.outline_keyboard_arrow_right_24),
+                        contentDescription = null,
+                        tint = Color.Yellow
+                    )
+                }
+            }
+        }
+
+        LazyRow(
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .padding(start = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(movies.size) { index ->
+                val movie = movies[index]
+                Column(
+                    modifier = Modifier
+                        .height(250.dp)
+                        .width(150.dp)
+                        .clickable {
+                        navController.navigate("booking/${movie.movie_id}")
+                    }
                 ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(
+                            model = ImageHelper.getMovieImageUrl(movie.movie_picture)
+                        ),
+                        contentDescription = movie.movie_name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(35.dp))
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = movie.movie_name,
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .padding(horizontal = 6.dp)
+                            .fillMaxWidth()
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun PhimTheoTheLoaiSkeleton(tieuDe: String) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 20.dp)
+            .background(color = Color(0xFF2C2C2C)),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(top = 5.dp)
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = tieuDe,
+                fontSize = 20.sp,
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(start = 10.dp)
+            )
+            TextButton(onClick = { }) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "Xem tất cả", color = Color.Yellow)
                     Icon(
                         painter = painterResource(id = R.drawable.outline_keyboard_arrow_right_24),
@@ -312,45 +400,28 @@ fun PhimTheoTheLoai(
                         .height(250.dp)
                         .width(150.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = anhResId),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop,
+                    Spacer(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .weight(1f)
+                            .height(180.dp)
                             .clip(RoundedCornerShape(35.dp))
+                            .background(Color.Gray.copy(alpha = 0.3f))
                     )
                     Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = tenPhim,
-                        color = Color.White,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(horizontal = 6.dp)
-                    )
-                    Row(
+                    Spacer(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(end = 6.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = theLoai,
-                            color = Color.White,
-                            modifier = Modifier.padding(horizontal = 6.dp)
-                        )
-                        Text(
-                            text = thoiLuong,
-                            color = Color.White,
-                            modifier = Modifier.padding(horizontal = 6.dp)
-                        )
-                    }
+                            .height(20.dp)
+                            .width(100.dp)
+                            .clip(RoundedCornerShape(4.dp))
+                            .background(Color.Gray.copy(alpha = 0.3f))
+                    )
                 }
             }
         }
     }
 }
+
+
 
 
 @Composable

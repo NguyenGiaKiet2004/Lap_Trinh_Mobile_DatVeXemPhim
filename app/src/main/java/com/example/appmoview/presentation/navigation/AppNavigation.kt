@@ -2,8 +2,10 @@ package com.example.appmoview.presentation.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.appmoview.presentation.screens.AccountScreen
 import com.example.appmoview.presentation.screens.DetailScreen
 import com.example.appmoview.presentation.screens.HomeScreen
@@ -23,7 +25,13 @@ fun AppNavigation(navController: NavHostController) {
         composable("home") { HomeScreen1(navController) }
         composable("search") { SearchScreen(navController) }
         composable("account") { AccountScreen(navController) }
-        composable("detailfilm") { DetailScreen(navController) }
+        composable(
+            route = "detail/{movieId}",
+            arguments = listOf(navArgument("movieId") { type = NavType.IntType })
+        ) {
+            val movieId = it.arguments?.getInt("movieId") ?: -1
+            DetailScreen(movieId = movieId, navController = navController)
+        }
         composable("ListTicker") { ListTicketScreen(navController) }
     }
 }

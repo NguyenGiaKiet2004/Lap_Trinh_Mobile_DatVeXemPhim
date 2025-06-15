@@ -2,13 +2,27 @@ package com.example.appmoview.presentation.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +40,7 @@ import androidx.navigation.NavController
 import com.example.appmoview.R
 
 @Composable
-fun DetailScreen(navController: NavController) {
+fun DetailScreen(movieId:Int ,navController: NavController) {
     val colorScheme = MaterialTheme.colorScheme
 
     Box(
@@ -84,51 +98,42 @@ fun DetailScreen(navController: NavController) {
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
-
-                Text(
-                    text = "HORROR 2D.3D.4DX",
-                    fontSize = 14.sp,
-                    color = colorScheme.onSurface,
-                    modifier = Modifier.padding(top = 6.dp).fillMaxWidth(),
-                    textAlign = TextAlign.Center
-                )
-                Divider(
-                    color = Color.White,
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
                     thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    color = Color.White
                 )
                 Spacer(modifier = Modifier.height(25.dp)) // spacing sau tiêu đề
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.Start
                 ) {
-                    Column {
-                        Text(stringResource(id = R.string.the_loai), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                        Text("Phim hành động", color = colorScheme.onSurface)
-                    }
-
-                    Column {
-                        Text(stringResource(id = R.string.thoi_luong), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.thoi_luong),
+                            fontWeight = FontWeight.SemiBold,
+                            color = colorScheme.onSurface
+                        )
                         Text("1hr:38min", color = colorScheme.onSurface)
                     }
-                    Column {
-                        Text(stringResource(id = R.string.ngay_phat_hanh), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                        Text("21 April 2023", color = colorScheme.onSurface)
+
+                    Spacer(modifier = Modifier.width(16.dp)) // Khoảng cách giữa 2 cột
+
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(
+                            text = stringResource(id = R.string.ngon_ngu),
+                            fontWeight = FontWeight.SemiBold,
+                            color = colorScheme.onSurface
+                        )
+                        Text("English", color = colorScheme.onSurface)
                     }
                 }
 
-                Spacer(modifier = Modifier.height(25.dp))
-
-                Column {
-                    Text(stringResource(id = R.string.ngon_ngu), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                    Text("English", color = colorScheme.onSurface)
-                }
-                Divider(
-                    color = Color.White,
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
                 Spacer(modifier = Modifier.height(25.dp))
 
                 Text(stringResource(id = R.string.cot_truyen), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
@@ -137,10 +142,10 @@ fun DetailScreen(navController: NavController) {
                     color = colorScheme.onSurface,
                     modifier = Modifier.padding(top = 12.dp)
                 )
-                Divider(
-                    color = Color.White,
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 4.dp),
                     thickness = 1.dp,
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    color = Color.White
                 )
                 Spacer(modifier = Modifier.height(35.dp))
 

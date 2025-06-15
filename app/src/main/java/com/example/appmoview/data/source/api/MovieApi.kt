@@ -13,5 +13,6 @@ interface MovieApi {
     fun getAllMovies(): Call<List<MovieRequest>>
 
     @GET("movie/get/{movie_id}")
-    suspend fun getMovieById(@Path("movie_id") movieId: Int): Movie
+    fun getMovieById(@Path("movie_id") movieId: Int): Call<MovieRequest>
+
 }
