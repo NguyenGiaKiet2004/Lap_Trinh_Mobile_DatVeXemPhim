@@ -18,12 +18,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,47 +37,70 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.appmoview.R
+import com.example.appmoview.presentation.viewmodels.MovieViewModel
+import com.example.appmoview.utils.ImageHelper
 
 @Composable
-fun DetailScreen(movieId:Int ,navController: NavController) {
+fun DetailScreen(movieId: Int, navController: NavController) {
     val colorScheme = MaterialTheme.colorScheme
+    val viewModel: MovieViewModel = viewModel()
+    val movieDetail by viewModel.movieDetail.observeAsState()
+    val isLoading by viewModel.isLoading.observeAsState(true)
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .padding(top = 40.dp)
-    ) {
-        // Ảnh banner
-        Image(
-            painter = painterResource(id = R.drawable.anhnen),
-            contentDescription = "Evil Dead Banner",
+    // Gọi API khi màn hình được hiển thị
+    androidx.compose.runtime.LaunchedEffect(movieId) {
+        viewModel.loadMovieDetail(movieId)
+    }
+
+    if (isLoading || movieDetail == null) {
+        // Loading hoặc chưa có dữ liệu
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .height(350.dp)
-                .clip(RoundedCornerShape(bottomStart = 44.dp, bottomEnd = 44.dp)),
-            contentScale = ContentScale.Crop,
-        )
+                .fillMaxSize()
+                .background(Color.Black),
+            contentAlignment = Alignment.Center
+        ) {
+            Text("Đang tải...", color = Color.White)
+        }
+    } else {
+        val movie = movieDetail!!
 
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-        ){
-            IconButton(onClick = {},
-                modifier = Modifier.align(Alignment.CenterStart)) {
-                Image(
-                    painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
-                    contentDescription = "Back",
-                    modifier = Modifier.size(24.dp),
-                    colorFilter = ColorFilter.tint(colorScheme.onSurface))
+                .fillMaxSize()
+                .background(Color.Black)
+        ) {
+            // movie_image
+            AsyncImage(
+                model = ImageHelper.getMovieImageUrl(movie.movie_picture),
+                contentDescription = movie.movie_name,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(350.dp)
+                    .clip(RoundedCornerShape(bottomStart = 44.dp, bottomEnd = 44.dp)),
+                contentScale = ContentScale.Crop
+            )
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+            ) {
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
+                        contentDescription = "Back",
+                        modifier = Modifier.size(24.dp),
+                        colorFilter = ColorFilter.tint(colorScheme.onSurface)
+                    )
+                }
             }
-
-        }
-
-        // Nội dung bên dưới
 
             Column(
                 modifier = Modifier
@@ -90,8 +114,9 @@ fun DetailScreen(movieId:Int ,navController: NavController) {
                     .padding(horizontal = 20.dp, vertical = 28.dp)
                     .verticalScroll(rememberScrollState()),
             ) {
+                // movie_name
                 Text(
-                    text = "EVIL DEAD RISE",
+                    text = movie.movie_name,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = colorScheme.onSurface,
@@ -103,7 +128,7 @@ fun DetailScreen(movieId:Int ,navController: NavController) {
                     thickness = 1.dp,
                     color = Color.White
                 )
-                Spacer(modifier = Modifier.height(25.dp)) // spacing sau tiêu đề
+                Spacer(modifier = Modifier.height(25.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -117,31 +142,49 @@ fun DetailScreen(movieId:Int ,navController: NavController) {
                             fontWeight = FontWeight.SemiBold,
                             color = colorScheme.onSurface
                         )
-                        Text("1hr:38min", color = colorScheme.onSurface)
+                        Text("${movie.movie_time} phút", color = colorScheme.onSurface)
                     }
 
-                    Spacer(modifier = Modifier.width(16.dp)) // Khoảng cách giữa 2 cột
+                    Spacer(modifier = Modifier.width(16.dp))
 
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
                         Text(
-                            text = stringResource(id = R.string.ngon_ngu),
+                            text = stringResource(id = R.string.gia_ve),
                             fontWeight = FontWeight.SemiBold,
                             color = colorScheme.onSurface
                         )
-                        Text("English", color = colorScheme.onSurface)
+                        Text("${movie.movie_price} VNĐ", color = colorScheme.onSurface)
                     }
                 }
 
                 Spacer(modifier = Modifier.height(25.dp))
 
-                Text(stringResource(id = R.string.cot_truyen), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
                 Text(
-                    "Evil Dead is a 2013 American supernatural horror film directed by Fede Álvarez...",
+                    text = stringResource(id = R.string.the_loai),
+                    fontWeight = FontWeight.SemiBold,
+                    color = colorScheme.onSurface
+                )
+                Text(
+                    movie.genres.joinToString(", "),
+                    color = colorScheme.onSurface,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+
+                Spacer(modifier = Modifier.height(25.dp))
+
+                Text(
+                    text = stringResource(id = R.string.cot_truyen),
+                    fontWeight = FontWeight.SemiBold,
+                    color = colorScheme.onSurface
+                )
+                Text(
+                    text = movie.movie_description,
                     color = colorScheme.onSurface,
                     modifier = Modifier.padding(top = 12.dp)
                 )
+
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 4.dp),
                     thickness = 1.dp,
@@ -150,7 +193,7 @@ fun DetailScreen(movieId:Int ,navController: NavController) {
                 Spacer(modifier = Modifier.height(35.dp))
 
                 Button(
-                    onClick = { /* Handle booking */ },
+                    onClick = { /* Xử lý đặt vé */ },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -163,5 +206,7 @@ fun DetailScreen(movieId:Int ,navController: NavController) {
                     Text(stringResource(id = R.string.dat_ve), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
+        }
     }
 }
+
