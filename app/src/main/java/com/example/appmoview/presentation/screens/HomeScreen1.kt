@@ -113,6 +113,10 @@ fun HomeScreen1(navController: NavController) {
     }
 }
 
+fun navigation(navController: NavController,id:Int){
+    navController.navigate("detail/${id}")
+}
+
 
 @Composable
 fun TimKiem(){
@@ -179,7 +183,7 @@ fun PhimHot(movies: List<MovieRequest>, navController: NavController) {
                         .height(300.dp)
                         .width(200.dp)
                         .clickable {
-                            navController.navigate("detail/${movie.movie_id}")
+                            navigation(navController,movie.movie_id)
                         }
                 ) {
                     Image(
@@ -321,7 +325,7 @@ fun PhimTheoTheLoai(
                         .height(250.dp)
                         .width(150.dp)
                         .clickable {
-                        navController.navigate("booking/${movie.movie_id}")
+                            navigation(navController,movie.movie_id)
                     }
                 ) {
                     Image(

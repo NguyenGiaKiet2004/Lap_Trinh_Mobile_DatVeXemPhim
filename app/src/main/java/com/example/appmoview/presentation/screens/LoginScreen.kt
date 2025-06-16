@@ -83,7 +83,7 @@ fun LoginScreen(navController: NavController) {
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text(stringResource(id = R.string.Email), color = colorScheme.onBackground) },
+            label = { Text(stringResource(id = R.string.username), color = colorScheme.onBackground) },
             singleLine = true,
             modifier = Modifier
                 .fillMaxWidth()

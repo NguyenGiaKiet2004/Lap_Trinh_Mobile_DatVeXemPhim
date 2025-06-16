@@ -4,7 +4,10 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.appmoview.data.source.retrofit.RetrofitClient
+import com.example.appmoview.domain.model.ApiResponse
+import com.example.appmoview.domain.model.MovieDetail
 import com.example.appmoview.domain.model.MovieRequest
+import com.example.appmoview.domain.model.Showtime
 import com.example.appmoview.domain.serviceInterface.MovieRepository
 import retrofit2.Call
 import retrofit2.Callback
@@ -41,26 +44,52 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
         })
     }
 
-    override fun fetchMovieById(id: Int, onResult: (MovieRequest?) -> Unit) {
+    override fun fetchMovieById(id: Int, onResult: (MovieDetail?) -> Unit) {
         _isLoading.value = true
 
-        RetrofitClient.movieInstance.getMovieById(id).enqueue(object : Callback<MovieRequest> {
-            override fun onResponse(call: Call<MovieRequest>, response: Response<MovieRequest>) {
+        RetrofitClient.movieInstance.getMovieById(id).enqueue(object : Callback<ApiResponse<MovieDetail>> {
+            override fun onResponse(call: Call<ApiResponse<MovieDetail>>, response: Response<ApiResponse<MovieDetail>>) {
                 _isLoading.value = false
-                if (response.isSuccessful) {
-                    onResult(response.body())
+                if (response.isSuccessful && response.body()?.success == true) {
+                    onResult(response.body()?.data)
                 } else {
                     _errorMessage.value = "Không thể tải phim (${response.code()})"
                     onResult(null)
                 }
             }
 
-            override fun onFailure(call: Call<MovieRequest>, t: Throwable) {
+            override fun onFailure(call: Call<ApiResponse<MovieDetail>>, t: Throwable) {
                 _isLoading.value = false
                 _errorMessage.value = "Lỗi kết nối: ${t.localizedMessage}"
                 onResult(null)
             }
         })
     }
+
+    private val _showtimeList = MutableLiveData<List<Showtime>>()
+    override val showtimeList: LiveData<List<Showtime>> get() = _showtimeList
+
+    override fun fetchAllShowtime() {
+        _isLoading.value = true
+
+        RetrofitClient.movieInstance.getAllShowtime().enqueue(object : Callback<List<Showtime>> {
+            override fun onResponse(call: Call<List<Showtime>>, response: Response<List<Showtime>>) {
+                _isLoading.value = false
+                if (response.isSuccessful) {
+                    _showtimeList.value = response.body() ?: emptyList()
+                } else {
+                    _errorMessage.value = "Không thể tải lịch chiếu (${response.code()})"
+                }
+            }
+
+            override fun onFailure(call: Call<List<Showtime>>, t: Throwable) {
+                _isLoading.value = false
+                _errorMessage.value = "Lỗi kết nối: ${t.localizedMessage}"
+            }
+        })
+    }
+
+
+
 
 }

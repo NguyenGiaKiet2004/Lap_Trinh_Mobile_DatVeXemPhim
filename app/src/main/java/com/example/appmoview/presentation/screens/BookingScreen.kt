@@ -249,3 +249,105 @@ fun LegendItem(text: String, color: Color) {
         Text(text = text, fontSize = 12.sp, color = Color.White)
     }
 }
+
+@Composable
+fun SeatBookingScreen(
+    selectedDay: String,
+    selectedTime: String
+) {
+    val selectedSeats = remember { mutableStateListOf<String>() }
+    val bookedSeats = listOf("B3", "C4", "E2", "F5")
+
+    val seatRows = listOf("A", "B", "C", "D", "E", "F", "G")
+    val seatCols = 6
+    val seatSize = 36.dp
+    val seatPadding = 8.dp
+    val screenWidth = (seatSize + seatPadding) * seatCols
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(colorScheme.background)
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Text(
+            text = "Ngày: $selectedDay - Giờ: $selectedTime",
+            fontSize = 16.sp,
+            color = colorScheme.onBackground,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.screen),
+                contentDescription = "Screen",
+                modifier = Modifier
+                    .width(screenWidth)
+                    .height(80.dp),
+                contentScale = ContentScale.Fit
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        seatRows.forEach { row ->
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                for (col in 1..seatCols) {
+                    val seatId = "$row$col"
+                    val isBooked = bookedSeats.contains(seatId)
+                    val isSelected = selectedSeats.contains(seatId)
+                    val seatColor = when {
+                        isBooked -> Color.Gray
+                        isSelected -> colorScheme.primary
+                        else -> Color(0xFF2C2C2C)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .size(seatSize)
+                            .background(
+                                color = seatColor,
+                                shape = RoundedCornerShape(6.dp)
+                            )
+                            .clickable(enabled = !isBooked) {
+                                if (isSelected) selectedSeats.remove(seatId)
+                                else selectedSeats.add(seatId)
+                            },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = seatId,
+                            fontSize = 10.sp,
+                            color = Color.White
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = { /* Đặt vé */ },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Text("MUA VÉ", fontSize = 17.sp, fontWeight = FontWeight.Bold)
+        }
+    }
+}
+
+
+
