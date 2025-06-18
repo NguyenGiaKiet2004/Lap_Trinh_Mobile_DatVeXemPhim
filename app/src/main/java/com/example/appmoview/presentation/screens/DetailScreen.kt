@@ -193,7 +193,7 @@ fun DetailScreen(movieId: Int, navController: NavController) {
                 Spacer(modifier = Modifier.height(35.dp))
 
                 Button(
-                    onClick = { /* Xử lý đặt vé */ },
+                    onClick = { navController.navigate("showtime_booking_screen/$movieId") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),

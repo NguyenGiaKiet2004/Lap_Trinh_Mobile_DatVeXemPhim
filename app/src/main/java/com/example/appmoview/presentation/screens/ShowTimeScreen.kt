@@ -50,8 +50,7 @@ import com.example.appmoview.presentation.viewmodels.MovieViewModel
 import com.example.appmoview.utils.ImageHelper
 
 @Composable
-fun ShowtimeScreen(movieId: Int, navController: NavController) {
-    val viewModel: MovieViewModel = viewModel()
+fun ShowtimeScreen(movieId: Int,viewModel: MovieViewModel, navController: NavController) {
     val isLoading by viewModel.isLoading.observeAsState(true)
     val movieDetail by viewModel.movieDetail.observeAsState()
     val showtimes by viewModel.showtimeList.observeAsState(emptyList())
@@ -211,7 +210,11 @@ fun ShowtimeScreen(movieId: Int, navController: NavController) {
 
             // Nút tiếp tục
             Button(
-                onClick = { selectedShowtime?.let { /* xử lý tiếp */ } },
+                onClick = {
+                    selectedShowtime?.let {
+                        viewModel.setSelectedShowtime(it)
+                        navController.navigate("seat_booking_screen")
+                } },
                 enabled = selectedShowtime != null,
                 modifier = Modifier
                     .fillMaxWidth()

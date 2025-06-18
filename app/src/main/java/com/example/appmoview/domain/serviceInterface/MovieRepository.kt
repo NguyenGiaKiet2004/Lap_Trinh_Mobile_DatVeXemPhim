@@ -14,4 +14,10 @@ interface MovieRepository {
 
     val showtimeList: LiveData<List<Showtime>>
     fun fetchAllShowtime()
+
+    fun checkBookedSeats(
+        showtimeId: Int,
+        seatIds: List<Int>,
+        onResult: (List<Int>?) -> Unit
+    )
 }

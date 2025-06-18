@@ -20,8 +20,7 @@ class MainActivity : AppCompatActivity() {
         setContent{
             SystemTheme{
                 val navController = rememberNavController()
-                /*AppNavigation(navController = navController)*/
-                ShowtimeScreen(1,navController)
+                AppNavigation(navController = navController)
             }
         }
     }

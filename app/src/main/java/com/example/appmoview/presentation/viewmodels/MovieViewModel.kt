@@ -35,4 +35,24 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
     fun getShowTimes(){
         repository.fetchAllShowtime()
     }
+
+    // MovieViewModel.kt
+    private val _selectedShowtime = MutableLiveData<Showtime?>()
+    val selectedShowtime: LiveData<Showtime?> get() = _selectedShowtime
+
+    fun setSelectedShowtime(showtime: Showtime) {
+        _selectedShowtime.value = showtime
+    }
+
+    private val _bookedSeats = MutableLiveData<List<Int>>()
+    val bookedSeats: LiveData<List<Int>> get() = _bookedSeats
+
+    fun checkBookedSeats(showtimeId: Int, seatIds: List<Int>) {
+        repository.checkBookedSeats(showtimeId, seatIds) { booked ->
+            _bookedSeats.postValue(booked ?: emptyList())
+        }
+    }
+
+
+
 }

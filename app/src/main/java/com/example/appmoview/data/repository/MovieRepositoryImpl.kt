@@ -89,6 +89,32 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
         })
     }
 
+    override fun checkBookedSeats(
+        showtimeId: Int,
+        seatIds: List<Int>,
+        onResult: (List<Int>?) -> Unit
+    ) {
+        _isLoading.value = true
+
+        RetrofitClient.movieInstance.checkBookedSeats(showtimeId, seatIds)
+            .enqueue(object : Callback<List<Int>> {
+                override fun onResponse(call: Call<List<Int>>, response: Response<List<Int>>) {
+                    _isLoading.value = false
+                    if (response.isSuccessful) {
+                        onResult(response.body())
+                    } else {
+                        _errorMessage.value = "Không thể kiểm tra ghế đã đặt (${response.code()})"
+                        onResult(null)
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Int>>, t: Throwable) {
+                    _isLoading.value = false
+                    _errorMessage.value = "Lỗi kết nối: ${t.localizedMessage}"
+                    onResult(null)
+                }
+            })
+    }
 
 
 
