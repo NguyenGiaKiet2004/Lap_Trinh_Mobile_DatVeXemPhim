@@ -13,6 +13,9 @@ import androidx.compose.material.icons.filled.Home // Biểu tượng Home
 import androidx.compose.material.icons.filled.Person // Biểu tượng Person
 import androidx.compose.material.icons.filled.Search // Biểu tượng Search
 import androidx.compose.runtime.Composable // Đánh dấu hàm là Composable Function
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment // Để căn chỉnh các thành phần con
 import androidx.compose.ui.Modifier // Đối tượng để thay đổi giao diện/hành vi của Composable
 import androidx.compose.ui.draw.clip // Để cắt bo tròn hình dạng
@@ -23,8 +26,13 @@ import androidx.compose.ui.text.font.FontWeight // Để định nghĩa độ đ
 import androidx.compose.ui.tooling.preview.Preview // Để xem trước Composable trong Android Studio
 import androidx.compose.ui.unit.dp // Đơn vị mật độ điểm ảnh (Density-independent Pixels)
 import androidx.compose.ui.unit.sp // Đơn vị kích thước văn bản (Scale-independent Pixels)
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.example.appmoview.R
+import com.example.appmoview.presentation.viewmodels.MovieViewModel
+import com.example.appmoview.utils.ImageHelper.getMovieImageUrl
+
 // --- 1. Data Models (Mô hình dữ liệu) ---
 // Đây là các lớp dữ liệu đơn giản để đại diện cho thông tin chúng ta sẽ hiển thị.
 // Trong một ứng dụng thực tế, dữ liệu này có thể đến từ API, cơ sở dữ liệu, v.v.
@@ -47,46 +55,48 @@ data class Section(
 
 @Composable
 fun HomeScreen(navController: NavController) {
+    val viewModel: MovieViewModel = viewModel()
+    val movies by viewModel.movieList.observeAsState(emptyList())
+
+    // Load dữ liệu khi màn hình được hiển thị lần đầu
+    LaunchedEffect(Unit) {
+        viewModel.loadMovies()
+    }
+
     Scaffold(
-        // topBar: Phần trên cùng của màn hình (App Bar)
-        topBar = {
-            TopAppBarContent() // Gọi Composable để tạo nội dung cho Top Bar
-        },
-        // bottomBar: Phần dưới cùng của màn hình (Navigation Bar)
-        bottomBar = {
-            BottomNavigationBar() // Gọi Composable để tạo nội dung cho Bottom Bar
-        },
-        // content: Phần chính của màn hình, nơi các thành phần UI khác sẽ được đặt.
-        // paddingValues: Tham số này được cung cấp bởi Scaffold để đảm bảo nội dung không bị che bởi Top/Bottom Bar.
+        topBar = { TopAppBarContent() },
+        bottomBar = { BottomNavigationBar() },
         content = { paddingValues ->
             Column(
                 modifier = Modifier
-                    .fillMaxSize() // Chiếm toàn bộ kích thước của màn hình
-                    .background(Color(0xFF1A1A1A)) // Đặt màu nền tối giống trong ảnh
-                    .padding(paddingValues) // Áp dụng padding từ Scaffold
-                    .padding(horizontal = 16.dp) // Thêm padding ngang cho nội dung chính
+                    .fillMaxSize()
+                    .background(Color(0xFF1A1A1A))
+                    .padding(paddingValues)
+                    .padding(horizontal = 16.dp)
             ) {
-                Spacer(modifier = Modifier.height(16.dp)) // Khoảng trống dọc
-                // Main featured movies (Phần phim nổi bật chính)
-                FeaturedMoviesSection() // Gọi Composable để hiển thị phần phim nổi bật
-                Spacer(modifier = Modifier.height(24.dp)) // Khoảng trống dọc
+                Spacer(modifier = Modifier.height(16.dp))
+                // Dữ liệu phim nổi bật vẫn là tĩnh nếu bạn muốn
+                FeaturedMoviesSection()
 
-                // Action Movies Section (Phần phim hành động)
+                Spacer(modifier = Modifier.height(24.dp))
+
                 MovieSection(
                     section = Section(
-                        title = "Phim hành động", // Tiêu đề của phần
-                        movies = listOf(
-                            Movie(101, "SALAAR (PART 1)", R.drawable.ps1), // Phim 1
-                            Movie(102, "FLASH (2023)", R.drawable.ps1),     // Phim 2
-                            Movie(103, "AQUAMAN", R.drawable.ps1),         // Phim 3
-                            // Thêm nhiều phim khác nếu cần
-                        )
+                        title = "Phim mới nhất từ server",
+                        movies = movies.map { it ->
+                            Movie(
+                                id = it.movie_id,
+                                title = it.movie_name,
+                                imageUrl = R.drawable.ps1 // Tạm dùng placeholder nếu chưa load ảnh từ URL
+                            )
+                        }
                     )
                 )
             }
         }
     )
 }
+
 
 // Giải thích về `Scaffold`:
 // `Scaffold` là một Composable cung cấp cấu trúc cơ bản cho màn hình Material Design.
@@ -263,55 +273,59 @@ fun MovieSection(section: Section) {
 // --- 7. MovieCard (Thẻ phim nhỏ hơn) ---
 // Hiển thị một thẻ phim với poster, tên phim và nút play nhỏ.
 
+
 @Composable
 fun MovieCard(movie: Movie) {
     Column(
         modifier = Modifier
-            .width(120.dp) // Chiều rộng cố định
-            .clip(RoundedCornerShape(8.dp)) // Bo tròn góc
-            .background(Color.DarkGray) // Nền màu xám đậm
-            .clickable { /* Handle movie click */ }
+            .width(120.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(Color.DarkGray)
+            .clickable { /* Xử lý click */ }
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(160.dp) // Chiều cao cố định cho phần hình ảnh
+                .height(160.dp)
                 .clip(RoundedCornerShape(8.dp))
         ) {
-            Image(
-                painter = painterResource(id = movie.imageUrl),
+            AsyncImage(
+                model = movie.imageUrl,
                 contentDescription = movie.title,
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize() // Chiếm toàn bộ Box
+                modifier = Modifier.fillMaxSize()
             )
-            // Play icon overlay (Nút play phủ lên hình ảnh)
+
+            // Nút play overlay nếu muốn
             Box(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd) // Căn chỉnh ở góc dưới bên phải
-                    .padding(8.dp) // Padding xung quanh nút play
-                    .size(30.dp) // Kích thước nút play
-                    .clip(RoundedCornerShape(15.dp)) // Bo tròn thành hình tròn
-                    .background(Color.Black.copy(alpha = 0.6f)) // Nền đen trong suốt
-                    .clickable { /* Handle play click */ },
-                contentAlignment = Alignment.Center // Căn giữa biểu tượng play bên trong Box này
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .size(30.dp)
+                    .clip(RoundedCornerShape(15.dp))
+                    .background(Color.Black.copy(alpha = 0.6f))
+                    .clickable { /* Xử lý play */ },
+                contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ps1), // Biểu tượng play (cần tạo trong drawable)
+                    painter = painterResource(id = R.drawable.ps1), // Thay bằng ic_play nếu có
                     contentDescription = "Play",
                     tint = Color.White,
-                    modifier = Modifier.size(16.dp) // Kích thước biểu tượng play
+                    modifier = Modifier.size(16.dp)
                 )
             }
         }
+
         Text(
             text = movie.title,
             color = Color.White,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(8.dp) // Padding xung quanh tên phim
+            modifier = Modifier.padding(8.dp)
         )
     }
 }
+
 
 // --- 8. BottomNavigationBar (Thanh điều hướng dưới cùng) ---
 // Tạo thanh điều hướng ở cuối màn hình với các biểu tượng và nhãn.

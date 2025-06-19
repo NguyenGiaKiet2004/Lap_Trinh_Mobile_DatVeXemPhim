@@ -23,7 +23,7 @@ fun AppNavigation(navController: NavHostController) {
         composable("home") { HomeScreen1(navController) }
         composable("search") { SearchScreen(navController) }
         composable("account") { AccountScreen(navController) }
-        composable("detailFilm") { DetailScreen(navController) }
-        composable("listTicket") { ListTicketScreen(navController) }
+        composable("detailfilm") { DetailScreen(navController) }
+        composable("ListTicker") { ListTicketScreen(navController) }
     }
 }
