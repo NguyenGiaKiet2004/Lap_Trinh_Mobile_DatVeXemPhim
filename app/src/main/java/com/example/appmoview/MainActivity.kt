@@ -18,8 +18,8 @@ class MainActivity : AppCompatActivity() {
         setContent{
             SystemTheme{
                 val navController = rememberNavController()
-                //AppNavigation(navController = navController)
-                ShowAllFilm()
+                AppNavigation(navController = navController)
+
             }
         }
     }

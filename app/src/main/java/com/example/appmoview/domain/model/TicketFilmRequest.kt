@@ -2,7 +2,7 @@ package com.example.appmoview.domain.model
 
 import java.util.Date
 
-data class TicketRequest(
+data class TicketFilmRequest(
     val id: Int,
     val movie_name: String,
     val movie_genre: String,
