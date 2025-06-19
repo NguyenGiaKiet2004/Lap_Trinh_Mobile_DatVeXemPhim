@@ -5,10 +5,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.appmoview.data.source.retrofit.RetrofitClient
 import com.example.appmoview.domain.model.ApiResponse
+import com.example.appmoview.domain.model.BookingRequest
 import com.example.appmoview.domain.model.MovieDetail
 import com.example.appmoview.domain.model.MovieRequest
 import com.example.appmoview.domain.model.Showtime
 import com.example.appmoview.domain.serviceInterface.MovieRepository
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -112,6 +114,31 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
                     _isLoading.value = false
                     _errorMessage.value = "Lỗi kết nối: ${t.localizedMessage}"
                     onResult(null)
+                }
+            })
+    }
+
+    override fun createBooking(
+        bookingRequest: BookingRequest,
+        onResult: (Boolean, String) -> Unit
+    ) {
+        _isLoading.value = true
+
+        RetrofitClient.movieInstance.createBooking(bookingRequest)
+            .enqueue(object : Callback<ResponseBody> {
+                override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                    _isLoading.value = false
+                    if (response.isSuccessful) {
+                        val message = response.body()?.string() ?: "Đặt vé thành công"
+                        onResult(true, message)
+                    } else {
+                        onResult(false, "Đặt vé thất bại (${response.code()})")
+                    }
+                }
+
+                override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                    _isLoading.value = false
+                    onResult(false, "Lỗi kết nối: ${t.localizedMessage}")
                 }
             })
     }

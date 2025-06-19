@@ -12,11 +12,13 @@ import com.example.appmoview.presentation.screens.DetailScreen
 import com.example.appmoview.presentation.screens.HomeScreen1
 import com.example.appmoview.presentation.screens.ListTicketScreen
 import com.example.appmoview.presentation.screens.LoginScreen
+import com.example.appmoview.presentation.screens.PaymentScreen
 import com.example.appmoview.presentation.screens.RegisterScreen
 import com.example.appmoview.presentation.screens.SearchScreen
 import com.example.appmoview.presentation.screens.SeatBookingScreen
 import com.example.appmoview.presentation.screens.ShowtimeScreen
 import com.example.appmoview.presentation.screens.SplashScreen
+import com.example.appmoview.presentation.screens.SuccessScreen
 import com.example.appmoview.presentation.viewmodels.MovieViewModel
 
 @Composable
@@ -46,6 +48,14 @@ fun AppNavigation(navController: NavHostController) {
         composable("seat_booking_screen") {
             val movieId = it.arguments?.getInt("movieId") ?: -1
             SeatBookingScreen(movieId = movieId, viewModel = viewModel, navController = navController)
+        }
+        composable("payment_screen") {
+            val movieId = it.arguments?.getInt("movieId") ?: -1
+            PaymentScreen(movieId = movieId, viewModel = viewModel, navController = navController)
+        }
+        composable("success_screen") {
+            val movieId = it.arguments?.getInt("movieId") ?: -1
+            SuccessScreen(movieId = movieId, viewModel = viewModel, navController = navController)
         }
         composable("ListTicker") { ListTicketScreen(navController) }
     }

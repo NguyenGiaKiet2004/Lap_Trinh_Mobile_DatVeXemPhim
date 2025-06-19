@@ -50,7 +50,7 @@ fun SeatBookingScreen(
     navController: NavController
 ) {
     val selectedSeats = remember { mutableStateListOf<String>() }
-
+    val selectedSeatNames = remember { mutableStateListOf<String>() }
 
     val seatRows = listOf("A", "B", "C", "D", "E", "F", "G")
     val seatCols = 6
@@ -58,15 +58,23 @@ fun SeatBookingScreen(
     val seatPadding = 10.dp
     val screenWidth = (seatSize + seatPadding) * seatCols
 
-
+    // ✅ Tạo map từ seatName ("A1", "B2"...) sang seatId (1, 2, ...)
+    val seatNameToId = remember {
+        mutableMapOf<String, Int>().apply {
+            var id = 1
+            for (row in seatRows) {
+                for (col in 1..seatCols) {
+                    val name = "$row$col"
+                    put(name, id++)
+                }
+            }
+        }
+    }
 
     val isLoading by viewModel.isLoading.observeAsState(true)
-    // Lấy showtime đã chọn
     val selectedShowtime = viewModel.selectedShowtime.value
-    // Sinh danh sách tất cả ghế (ví dụ 42 ghế: 1 đến 42)
     val allSeatIds = (1..(seatRows.size * seatCols)).toList()
 
-    // Gọi kiểm tra ghế đã đặt nếu có showtime
     LaunchedEffect(selectedShowtime) {
         selectedShowtime?.let {
             viewModel.checkBookedSeats(it.showtimeId, allSeatIds)
@@ -93,8 +101,6 @@ fun SeatBookingScreen(
             .background(colorScheme.background)
             .padding(16.dp)
     ) {
-        // Nút Back
-        // Row chứa cả nút back và tiêu đề căn giữa
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
@@ -111,7 +117,6 @@ fun SeatBookingScreen(
                 )
             }
 
-            // Căn giữa tiêu đề bằng cách đặt trong Box giữa Spacer
             Box(
                 modifier = Modifier.weight(1f),
                 contentAlignment = Alignment.Center
@@ -124,32 +129,30 @@ fun SeatBookingScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.width(48.dp)) // chiếm chỗ đối xứng với nút back
+            Spacer(modifier = Modifier.width(48.dp))
         }
 
-
-        // Màn hình chiếu
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             Image(
                 painter = painterResource(id = R.drawable.screen),
                 contentDescription = "Screen",
                 modifier = Modifier
                     .width(screenWidth)
-                    .height(100.dp), // <<-- TĂNG CHIỀU CAO Ở ĐÂY
+                    .height(100.dp),
                 contentScale = ContentScale.Fit
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Ghế
         Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
             seatRows.forEach { row ->
                 Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
                     for (col in 1..seatCols) {
-                        val seatId = "$row$col"
-                        val isBooked = bookedSeats.contains(seatId.toIntOrNull())
-                        val isSelected = selectedSeats.contains(seatId)
+                        val seatName = "$row$col"
+                        val seatId = seatNameToId[seatName]
+                        val isBooked = bookedSeats.contains(seatId)
+                        val isSelected = selectedSeats.contains(seatName)
                         val seatColor = when {
                             isBooked -> Color.Gray
                             isSelected -> colorScheme.primary
@@ -162,12 +165,17 @@ fun SeatBookingScreen(
                                 .size(seatSize)
                                 .background(color = seatColor, shape = RoundedCornerShape(6.dp))
                                 .clickable(enabled = !isBooked) {
-                                    if (isSelected) selectedSeats.remove(seatId)
-                                    else selectedSeats.add(seatId)
+                                    if (isSelected) {
+                                        selectedSeats.remove(seatName)
+                                        selectedSeatNames.remove(seatName)
+                                    } else {
+                                        selectedSeats.add(seatName)
+                                        selectedSeatNames.add(seatName)
+                                    }
                                 },
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(text = seatId, fontSize = 12.sp, color = Color.White)
+                            Text(text = seatName, fontSize = 12.sp, color = Color.White)
                         }
                     }
                 }
@@ -181,10 +189,7 @@ fun SeatBookingScreen(
                 LegendItem("Hết", Color.Gray)
             }
 
-
-
-            // Nút MUA VÉ
-            Spacer(modifier = Modifier.height(32.dp)) // tạo khoảng cách trước nút
+            Spacer(modifier = Modifier.height(32.dp))
 
             val totalPrice = selectedSeats.size * selectedShowtime!!.movies.movie_price
             val formattedPrice = NumberFormat.getNumberInstance(Locale("vi", "VN")).format(totalPrice)
@@ -198,18 +203,21 @@ fun SeatBookingScreen(
                     .padding(bottom = 8.dp)
             )
 
-
             Spacer(modifier = Modifier.height(5.dp))
             Box(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 Button(
-                    onClick = { /* Handle đặt vé */ },
+                    onClick = {
+                        // ✅ Lấy seat_id đúng
+                        val selectedSeatIds = selectedSeats.mapNotNull { seatNameToId[it] }
+                        viewModel.saveSelectedSeats(selectedSeatIds, selectedSeatNames)
+                        navController.navigate("payment_screen")
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp), // cao hơn 1 chút
+                        .height(56.dp),
                     shape = RoundedCornerShape(16.dp)
                 ) {
                     Text(
@@ -220,13 +228,9 @@ fun SeatBookingScreen(
                     )
                 }
             }
-
         }
     }
-
 }
-
-
 
 @Composable
 fun LegendItem(text: String, color: Color) {
@@ -240,6 +244,7 @@ fun LegendItem(text: String, color: Color) {
         Text(text = text, fontSize = 16.sp, color = Color.White)
     }
 }
+
 
 
 

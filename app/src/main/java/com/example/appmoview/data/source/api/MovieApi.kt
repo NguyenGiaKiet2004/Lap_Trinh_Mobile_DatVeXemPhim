@@ -2,9 +2,11 @@ package com.example.appmoview.data.source.api
 
 
 import com.example.appmoview.domain.model.ApiResponse
+import com.example.appmoview.domain.model.BookingRequest
 import com.example.appmoview.domain.model.MovieDetail
 import com.example.appmoview.domain.model.MovieRequest
 import com.example.appmoview.domain.model.Showtime
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -28,6 +30,9 @@ interface MovieApi {
         @Query("showtimeId") showtimeId: Int,
         @Body seatIds: List<Int>
     ): Call<List<Int>>
+
+    @POST("booking/create")
+    fun createBooking(@Body bookingRequest: BookingRequest): Call<ResponseBody>
 
 
 }

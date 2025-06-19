@@ -1,6 +1,7 @@
 package com.example.appmoview.domain.serviceInterface
 
 import androidx.lifecycle.LiveData
+import com.example.appmoview.domain.model.BookingRequest
 import com.example.appmoview.domain.model.MovieDetail
 import com.example.appmoview.domain.model.MovieRequest
 import com.example.appmoview.domain.model.Showtime
@@ -19,5 +20,10 @@ interface MovieRepository {
         showtimeId: Int,
         seatIds: List<Int>,
         onResult: (List<Int>?) -> Unit
+    )
+
+    fun createBooking(
+        bookingRequest: BookingRequest,
+        onResult: (Boolean, String) -> Unit
     )
 }

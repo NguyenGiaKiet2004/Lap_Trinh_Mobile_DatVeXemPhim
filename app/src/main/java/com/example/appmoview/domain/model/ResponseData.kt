@@ -5,3 +5,8 @@ data class ResponseData(
     val data: Any? // hoặc dùng JsonObject nếu bạn cần xử lý cụ thể
 )
 
+data class LoginResponseData(
+    val userId: Int,
+    val username: String,
+    val token: String
+)
