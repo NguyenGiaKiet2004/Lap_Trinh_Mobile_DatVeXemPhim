@@ -1,28 +1,21 @@
 package com.example.appmoview.presentation.viewmodels
 
+import android.app.Application
 import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.example.appmoview.data.repository.BookingRepositoryImpl
 import com.example.appmoview.domain.model.BookingHistory
 
-class BookingViewModel(private val context: Context) : ViewModel() {
+class BookingViewModel(application: Application) : AndroidViewModel(application) {
+    private val repository = BookingRepositoryImpl(application.applicationContext)
 
-    private val repository = BookingRepositoryImpl(context)
+    val bookings = repository.bookings
+    val isLoading = repository.isLoading
+    val errorMessage = repository.errorMessage
 
-    val bookings: LiveData<List<BookingHistory>> = repository.bookings
-    val isLoading: LiveData<Boolean> = repository.isLoading
-    val errorMessage: LiveData<String> = repository.errorMessage
-
-    init {
-        loadBookingHistory()
-    }
-
-    fun loadBookingHistory() {
-        val sharedPref = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
-        val userId = sharedPref.getString("user_id", null)?.toIntOrNull()
-        if (userId != null) {
-            repository.fetchBookingHistory(userId)
-        }
+    fun loadBookings(userId: Int) {
+        repository.fetchBookingHistory(userId)
     }
 }

@@ -1,5 +1,6 @@
 package com.example.appmoview.presentation.screens
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -40,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -119,35 +121,43 @@ fun navigation(navController: NavController,id:Int){
 
 
 @Composable
-fun TimKiem(){
+fun TimKiem() {
+    val context = LocalContext.current
 
-        Row(
+    // Đọc username từ SharedPreferences
+    val username = remember {
+        val sharedPref = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+        sharedPref.getString("username", "Người dùng") ?: "Người dùng"
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .padding(top = 50.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = "Chào, $username",
+            color = Color.White,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
+        IconButton(
+            onClick = {},
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(top = 50.dp),
-            horizontalArrangement = Arrangement.SpaceBetween, // Căn chỉnh cách đều
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Text(
-                text = "Chào, Kiệt",
-                modifier = Modifier,
-                color = Color.White,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+                .background(Color.DarkGray, shape = RoundedCornerShape(25.dp))
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "Search",
+                tint = Color.White,
             )
-            IconButton(onClick = {},
-                modifier = Modifier
-                    .background(Color.DarkGray, shape = RoundedCornerShape(25.dp)),
-                ){
-                Icon(
-                    imageVector = Icons.Default.Search, // Sử dụng biểu tượng tìm kiếm mặc định
-                    contentDescription = "Search",
-                    tint = Color.White, // Màu của biểu tượng
-                )
-            }
         }
     }
+}
+
 
 @Composable
 fun PhimHot(movies: List<MovieRequest>, navController: NavController) {

@@ -8,9 +8,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.compose.rememberNavController
 import com.example.appmoview.presentation.navigation.AppNavigation
 import com.example.appmoview.presentation.screens.DetailScreen
+import com.example.appmoview.presentation.screens.ListTicketScreen
 import com.example.appmoview.presentation.screens.RegisterScreen
 import com.example.appmoview.presentation.screens.ShowtimeScreen
 import com.example.appmoview.presentation.theme.SystemTheme
+import com.example.appmoview.presentation.viewmodels.BookingViewModel
 import com.example.appmoview.utils.logout
 
 class MainActivity : AppCompatActivity() {
@@ -20,7 +22,8 @@ class MainActivity : AppCompatActivity() {
         setContent{
             SystemTheme{
                 val navController = rememberNavController()
-                AppNavigation(navController = navController)
+                /*AppNavigation(navController = navController)*/
+                ListTicketScreen(navController)
             }
         }
     }

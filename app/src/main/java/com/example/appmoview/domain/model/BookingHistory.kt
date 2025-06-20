@@ -1,10 +1,11 @@
 package com.example.appmoview.domain.model
 
+
 data class BookingHistory(
-    val id: Int,
-    val movieName: String,
-    val movieType: String,
-    val duration: String,
-    val showTime: String,
-    val showDate: String
+    val booking_id: Int,
+    val user_id: Int,
+    val room_id: Int,
+    val showtime_id: Int,
+    val price: Int,
+    val booking_status: String
 )

@@ -33,8 +33,8 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
-@RequiresApi(Build.VERSION_CODES.O)
-fun isPastDate(dateStr: String): Boolean {
+
+/*fun isPastDate(dateStr: String): Boolean {
     return try {
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         val date = LocalDate.parse(dateStr, formatter)
@@ -42,11 +42,11 @@ fun isPastDate(dateStr: String): Boolean {
     } catch (e: Exception) {
         false // nếu lỗi định dạng thì coi như chưa qua
     }
-}
+}*/
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ListTicketScreen(navController: NavController,viewModel: BookingViewModel = viewModel()) {
+fun ListTicketScreen(navController: NavController) {
+    val viewModel: BookingViewModel = viewModel()
     val bookings by viewModel.bookings.observeAsState(emptyList())
 
     val colorScheme = MaterialTheme.colorScheme
@@ -110,7 +110,7 @@ fun ListTicketScreen(navController: NavController,viewModel: BookingViewModel = 
                                 .fillMaxWidth()
                                 .padding(0.dp),
                             fontSize = 12.sp,
-                            color = if (isPastDate(booking.showDate)) Color.Red else Color.Green,
+                            color = if (/*isPastDate(booking.showDate)*/ true) Color.Red else Color.Green,
                             textAlign = TextAlign.Right
                         )
                         Text(
