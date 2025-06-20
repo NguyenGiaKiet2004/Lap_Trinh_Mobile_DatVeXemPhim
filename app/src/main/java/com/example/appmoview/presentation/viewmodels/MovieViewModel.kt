@@ -69,6 +69,11 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
     private val _bookingResult = MutableLiveData<Pair<Boolean, String>>()
     val bookingResult: LiveData<Pair<Boolean, String>> get() = _bookingResult
 
+    fun clearBookingResult() {
+        _bookingResult.value = null
+    }
+
+
     fun createBooking(userId: Int, showtimeId: Int, seatIds: List<Int>) {
         repository.createBooking(
             bookingRequest = BookingRequest(userId, showtimeId, seatIds)

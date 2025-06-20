@@ -175,7 +175,8 @@ fun PaymentScreen(
     // Quan sát kết quả đặt vé
     LaunchedEffect(bookingResult) {
         bookingResult?.let { (success, message) ->
-            isLoading = false // Tắt loading sau khi có kết quả
+            isLoading = false
+            viewModel.clearBookingResult() // Reset để tránh gọi lại
             if (success) {
                 navController.navigate("success_screen") {
                     popUpTo(0) { inclusive = true }
@@ -185,6 +186,7 @@ fun PaymentScreen(
             }
         }
     }
+
 }
 
 
