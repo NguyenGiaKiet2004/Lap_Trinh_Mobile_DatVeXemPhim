@@ -1,10 +1,15 @@
 package com.example.appmoview
 
+import ShowAllFilm
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.compose.rememberNavController
 import com.example.appmoview.presentation.navigation.AppNavigation
+import com.example.appmoview.presentation.screens.DetailScreen
+import com.example.appmoview.presentation.screens.RegisterScreen
+import com.example.appmoview.presentation.screens.ShowtimeScreen
 import com.example.appmoview.presentation.theme.SystemTheme
 import com.example.appmoview.utils.logout
 

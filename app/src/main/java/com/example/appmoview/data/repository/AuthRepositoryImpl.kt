@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.appmoview.data.source.retrofit.RetrofitClient
 import com.example.appmoview.domain.model.LoginRequest
-import com.example.appmoview.domain.model.LoginResponseData
 import com.example.appmoview.domain.model.RegisterRequest
 import com.example.appmoview.domain.model.ResponseData
 import com.example.appmoview.domain.serviceInterface.AuthRepository
@@ -15,9 +14,6 @@ import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import com.google.gson.Gson
-import com.google.gson.internal.LinkedTreeMap
-
 
 class AuthRepositoryImpl(private val context: Context) : AuthRepository {
 
@@ -37,14 +33,10 @@ class AuthRepositoryImpl(private val context: Context) : AuthRepository {
                         if (responseData != null && responseData.success) {
                             _loginStatus.value = true
 
-                            // ⚠️ Parse data về LoginResponseData bằng Gson
-                            val gson = Gson()
-                            val jsonData = gson.toJson(responseData.data)
-                            val loginData = gson.fromJson(jsonData, LoginResponseData::class.java)
-
-                            val token = loginData.token
-                            val userId = loginData.userId.toString()
-                            val username = loginData.username
+                            val dataMap = responseData.data as? Map<*, *>
+                            val token = dataMap?.get("token") as? String
+                            val userId = dataMap?.get("userId")?.toString() ?: ""
+                            val username = dataMap?.get("username")?.toString() ?: ""
 
                             // ✅ Lưu vào SharedPreferences
                             val sharedPref = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
@@ -69,7 +61,6 @@ class AuthRepositoryImpl(private val context: Context) : AuthRepository {
                 }
             })
     }
-
 
 
 

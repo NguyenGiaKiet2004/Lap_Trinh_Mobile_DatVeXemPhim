@@ -17,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.appmoview.R
 
 data class Film(val title: String, val imageRes: Int)
@@ -34,7 +35,7 @@ val actionMovies = listOf(
 )
 
 @Composable
-fun ShowAllFilm(films: List<Film> = actionMovies, categoryTitle: String = "Phim hành động") {
+fun ShowAllFilm(navController: NavController, films: List<Film> = actionMovies, categoryTitle: String = "Phim hành động") {
     Column(
         modifier = Modifier
             .fillMaxSize()
