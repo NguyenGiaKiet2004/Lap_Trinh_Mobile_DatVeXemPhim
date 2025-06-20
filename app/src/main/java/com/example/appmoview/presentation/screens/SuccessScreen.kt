@@ -29,16 +29,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.appmoview.R
-import com.example.appmoview.presentation.viewmodels.MovieViewModel
 
 @Composable
-fun SuccessScreen(
-    movieId: Int,
-    viewModel: MovieViewModel,
-    navController: NavController
-) {
+fun SuccessScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -150,11 +144,7 @@ fun SuccessScreen(
 
         // Nút TRANG CHỦ
         Button(
-            onClick = {
-                navController.navigate("home") {
-                    popUpTo(0) { inclusive = true }
-                }
-            },
+            onClick = { /* xử lý về trang chủ */ },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),

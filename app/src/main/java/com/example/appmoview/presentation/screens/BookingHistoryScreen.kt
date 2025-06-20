@@ -1,5 +1,7 @@
 package com.example.appmoview.presentation.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,6 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,14 +21,38 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appmoview.R
+import androidx.compose.runtime.getValue//for by
+import com.example.appmoview.presentation.viewmodels.BookingViewModel
+import androidx.compose.foundation.lazy.items//for items
 
+//for Date
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun isPastDate(dateStr: String): Boolean {
+    return try {
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val date = LocalDate.parse(dateStr, formatter)
+        date.isBefore(LocalDate.now())
+    } catch (e: Exception) {
+        false // nếu lỗi định dạng thì coi như chưa qua
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun ListTicketScreen(navController: NavController) {
+fun ListTicketScreen(navController: NavController,viewModel: BookingViewModel = viewModel()) {
+    val bookings by viewModel.bookings.observeAsState(emptyList())
+
     val colorScheme = MaterialTheme.colorScheme
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(Color.Black)
             .padding(top = 40.dp)
     ) {
@@ -36,7 +63,7 @@ fun ListTicketScreen(navController: NavController) {
                 .padding(16.dp),
         ) {
             IconButton(
-                onClick = {},
+                onClick = {navController.popBackStack()},
                 modifier = Modifier.align(Alignment.CenterStart)
             ) {
                 Image(
@@ -62,7 +89,7 @@ fun ListTicketScreen(navController: NavController) {
         LazyColumn(
             modifier = Modifier.fillMaxSize()
         ) {
-            items(5) {
+            items(bookings) {booking->
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -78,14 +105,16 @@ fun ListTicketScreen(navController: NavController) {
                             .fillMaxSize()
                     ) {
                         Text(
-                            text="21/9/2025",
-                            modifier = Modifier.fillMaxWidth().padding(0.dp),
+                            text=booking.showDate,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(0.dp),
                             fontSize = 12.sp,
-                            color = Color.Green,
+                            color = if (isPastDate(booking.showDate)) Color.Red else Color.Green,
                             textAlign = TextAlign.Right
                         )
                         Text(
-                            text = "EVIL DEAD RISE",
+                            text = booking.movieName,
                             fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
                             color = colorScheme.onSurface,
@@ -94,10 +123,12 @@ fun ListTicketScreen(navController: NavController) {
                         )
 
                         Text(
-                            text = "HORROR 2D.3D.4DX",
+                            text = booking.movieType,
                             fontSize = 14.sp,
                             color = colorScheme.onSurface,
-                            modifier = Modifier.padding(top = 6.dp).fillMaxWidth(),
+                            modifier = Modifier
+                                .padding(top = 6.dp)
+                                .fillMaxWidth(),
                             textAlign = TextAlign.Center
                         )
 
@@ -117,17 +148,17 @@ fun ListTicketScreen(navController: NavController) {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(stringResource(id = R.string.id_phim), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                                Text("123", color = colorScheme.onSurface)}
+                                Text("${booking.id}", color = colorScheme.onSurface)}
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(stringResource(id = R.string.thoi_luong), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                                Text("1h:38min", color = colorScheme.onSurface)}
+                                Text(booking.duration, color = colorScheme.onSurface)}
                             Column(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(stringResource(id = R.string.gio_chieu), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                                Text("23h", color = colorScheme.onSurface)}
+                                Text(booking.showTime, color = colorScheme.onSurface)}
                         }
                         Divider(
                             color = Color.White,

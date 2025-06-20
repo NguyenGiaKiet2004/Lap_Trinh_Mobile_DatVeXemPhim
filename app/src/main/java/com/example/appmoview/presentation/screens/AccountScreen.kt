@@ -1,26 +1,26 @@
 package com.example.appmoview.presentation.screens
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme.colors
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,108 +37,275 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import androidx.navigation.Navigator
 import coil.compose.AsyncImage
 import com.example.appmoview.R
-import java.nio.file.WatchEvent
+import com.example.appmoview.presentation.viewmodels.UserViewModel
 
 @Composable
-fun AccountScreen(navController: NavController) {
+fun AccountScreen(navController: NavController,userViewModel: UserViewModel = viewModel(),onLogout: ()-> Unit) {
     val colorScheme = MaterialTheme.colorScheme
-    Column(
-        modifier = Modifier.fillMaxSize()
-            .background(Color.Black)
-            .padding(top = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    val context = LocalContext.current
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+    val userProfile by userViewModel.userProfile.observeAsState()
+    val updateStatus by userViewModel.updateStatus.observeAsState()
+
+    // State để quản lý chế độ chỉnh sửa
+    var isEditing by remember { mutableStateOf(false) }
+
+    // State để giữ giá trị của các TextField khi đang chỉnh sửa
+    var fullName by remember { mutableStateOf("") }
+    var phoneNumber by remember { mutableStateOf("") }
+    var address by remember { mutableStateOf("") }
+
+    // Lấy dữ liệu người dùng khi màn hình được bật lần đầu
+    LaunchedEffect(Unit) {
+        userViewModel.fetchUserProfile()
+    }
+
+    // Cập nhật state của TextField khi có dữ liệu mới từ ViewModel
+    LaunchedEffect(userProfile) {
+        userProfile?.let {
+            fullName = it.fullName ?: ""
+            phoneNumber = it.phoneNumber ?: ""
+            address = it.address ?: ""
+        }
+    }
+
+    // Hiển thị Toast thông báo kết quả cập nhật
+    LaunchedEffect(updateStatus) {
+        when (updateStatus) {
+            true -> {
+                Toast.makeText(context, "Cập nhật thành công!", Toast.LENGTH_SHORT).show()
+                isEditing = false // Thoát chế độ chỉnh sửa sau khi lưu thành công
+                userViewModel.onUpdateStatusShown() // Reset trạng thái để không hiển thị lại toast
+            }
+
+            false -> {
+                Toast.makeText(context, "Cập nhật thất bại!", Toast.LENGTH_SHORT).show()
+                userViewModel.onUpdateStatusShown()
+            }
+
+            null -> { /* Do nothing */
+            }
+        }
+    }
+
+    if (userProfile == null) {
+        // Hiển thị loading indicator khi chưa có dữ liệu
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = Color.Yellow)
+        }
+    } else {
+        Column(
+            modifier = Modifier.fillMaxSize()
+                .background(Color.Black)
+                .padding(top = 40.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            IconButton(
-                onClick = {},
-                modifier = Modifier.align(Alignment.CenterStart)
+            // Header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
-                    contentDescription = "Back",
-                    modifier = Modifier.size(24.dp),
-                    colorFilter = ColorFilter.tint(colorScheme.onSurface)
+                IconButton(
+                    onClick = {navController.popBackStack()},
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
+                        contentDescription = "Back",
+                        modifier = Modifier.size(24.dp),
+                        colorFilter = ColorFilter.tint(colorScheme.onSurface)
+                    )
+                }
+
+                Text(
+                    text = "Thông tin tài khoảng",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.onSurface,
+                    modifier = Modifier.align(Alignment.Center),
+                    textAlign = TextAlign.Center
                 )
             }
 
-            Text(
-                text = "Thông tin tài khoảng",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.onSurface,
-                modifier = Modifier.align(Alignment.Center),
-                textAlign = TextAlign.Center
+            AvatarPicker()
+            Spacer(modifier = Modifier.height(16.dp))
+
+            InformationPerson(
+                fullName = fullName,
+                email = userProfile?.email ?: "N/A",
+                phone = phoneNumber,
+                address = address,
+                isEditing = isEditing,
+                onEdit = { isEditing = true },
+                onCancel = {
+                    isEditing = false
+                    fullName = userProfile?.fullName ?: ""
+                    phoneNumber = userProfile?.phoneNumber ?: ""
+                    address = userProfile?.address ?: ""
+                },
+                onSave = {
+                    userViewModel.updateUserProfile(fullName, phoneNumber, address)
+                },
+                onFullNameChange = { fullName = it },
+                onPhoneChange = { phoneNumber = it },
+                onAddressChange = { address = it }
             )
+            Spacer(modifier = Modifier.weight(1f))
+            Button(
+                onClick = {},
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.background
+                ),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 40.dp, vertical = 40.dp)
+                    .height(60.dp)
+            ) {
+                Text(text = "Đăng xuất", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+    @Composable
+    fun AvatarPicker() {
+        val context = LocalContext.current
+        var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+        val launcher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { uri: Uri? ->
+            imageUri = uri
         }
 
-        AvatarPicker()
-        Spacer(modifier = Modifier.height(16.dp))
-        InformationPerson()
-        Spacer(modifier = Modifier.weight(1f))
-        Button(
-            onClick = {},
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.background
-            ),
-            shape = RoundedCornerShape(14.dp),
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 40.dp, vertical = 40.dp)
-                .height(60.dp)
+                .size(200.dp)
+                .clip(CircleShape)
+                .clickable { launcher.launch("image/*") }
+                .background(Color.Gray),
+            contentAlignment = Alignment.Center,
         ) {
-            Text(text = "Đăng xuất", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+            if (imageUri != null) {
+                AsyncImage(
+                    model = imageUri,
+                    contentDescription = "Avatar",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = "Default Avatar",
+                    modifier = Modifier.size(150.dp),
+                    tint = Color.White
+                )
+            }
         }
     }
-}
+
+
 @Composable
-fun AvatarPicker() {
-    val context = LocalContext.current
-    var imageUri by remember { mutableStateOf<Uri?>(null) }
-
-    val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        imageUri = uri
-    }
-
-    Box(
+fun InformationPerson(
+    fullName: String,
+    email: String,
+    phone: String,
+    address: String,
+    isEditing: Boolean,
+    onEdit: () -> Unit,
+    onCancel: () -> Unit,
+    onSave: () -> Unit,
+    onFullNameChange: (String) -> Unit,
+    onPhoneChange: (String) -> Unit,
+    onAddressChange: (String) -> Unit
+) {
+    Column(
         modifier = Modifier
-            .size(200.dp)
-            .clip(CircleShape)
-            .clickable { launcher.launch("image/*") }
-            .background(Color.Gray),
-        contentAlignment = Alignment.Center,
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.dp))
+            .padding(horizontal = 15.dp, vertical = 30.dp)
+            .verticalScroll(rememberScrollState())
     ) {
-        if (imageUri != null) {
-            AsyncImage(
-                model = imageUri,
-                contentDescription = "Avatar",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize()
-            )
-        } else {
-            Icon(
-                imageVector = Icons.Default.Person,
-                contentDescription = "Default Avatar",
-                modifier = Modifier.size(150.dp),
-                tint = Color.White
-            )
+        OutlinedTextField(
+            value = fullName,
+            onValueChange = onFullNameChange,
+            label = { Text("Họ và tên") },
+            enabled = isEditing,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = {},
+            label = { Text("Email") },
+            enabled = false,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = phone,
+            onValueChange = onPhoneChange,
+            label = { Text("Số điện thoại") },
+            enabled = isEditing,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        OutlinedTextField(
+            value = address,
+            onValueChange = onAddressChange,
+            label = { Text("Địa chỉ") },
+            enabled = isEditing,
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            if (isEditing) {
+                Button(
+                    onClick = onCancel,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Gray),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Hủy", fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.width(30.dp))
+
+                Button(
+                    onClick = onSave,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow),
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text("Lưu", color = Color.Black, fontWeight = FontWeight.Bold)
+                }
+            } else {
+                Button(
+                    onClick = onEdit,
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.Yellow),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Chỉnh sửa", color = Color.Black, fontWeight = FontWeight.Bold)
+                }
+            }
         }
     }
 }
 
+/*
 @Composable
 fun InformationPerson(){
+
     // Nội dung bên dưới
 
     Column(
@@ -255,7 +422,7 @@ fun InformationPerson(){
 
 
 
-}
+}*/
 
 
 

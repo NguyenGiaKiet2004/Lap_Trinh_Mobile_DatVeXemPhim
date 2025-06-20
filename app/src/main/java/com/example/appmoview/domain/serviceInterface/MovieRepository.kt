@@ -26,4 +26,5 @@ interface MovieRepository {
         bookingRequest: BookingRequest,
         onResult: (Boolean, String) -> Unit
     )
+
 }
