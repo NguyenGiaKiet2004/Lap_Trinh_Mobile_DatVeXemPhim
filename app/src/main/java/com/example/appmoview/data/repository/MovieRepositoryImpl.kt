@@ -123,7 +123,7 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
 
     override fun createBooking(
         bookingRequest: BookingRequest,
-        onResult: (Boolean, String, Int?) -> Unit
+        onResult: (Boolean, String) -> Unit
     ) {
         _isLoading.value = true
 
@@ -138,18 +138,18 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
                             val json = JSONObject(bodyString)
                             val bookingId = json.getInt("booking_id")
                             callFakePayment(bookingId)
-                            onResult(true, "Đặt vé thành công", bookingId)
+                            onResult(true, "Đặt vé thành công")
                         } catch (e: Exception) {
-                            onResult(false, "Đặt vé thành công nhưng không đọc được booking_id", null)
+                            onResult(false, "Đặt vé thành công nhưng không đọc được booking_id")
                         }
                     } else {
-                        onResult(false, "Đặt vé thất bại (${response.code()})", null)
+                        onResult(false, "Đặt vé thất bại (${response.code()})")
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     _isLoading.value = false
-                    onResult(false, "Lỗi kết nối: ${t.localizedMessage}", null)
+                    onResult(false, "Lỗi kết nối: ${t.localizedMessage}")
                 }
             })
     }

@@ -1,8 +1,5 @@
 package com.example.appmoview.presentation.navigation
 
-import ShowAllFilm
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -15,6 +12,7 @@ import com.example.appmoview.presentation.screens.DetailScreen
 import com.example.appmoview.presentation.screens.HomeScreen1
 import com.example.appmoview.presentation.screens.ListTicketScreen
 import com.example.appmoview.presentation.screens.LoginScreen
+import com.example.appmoview.presentation.screens.PaymentScreen
 import com.example.appmoview.presentation.screens.RegisterScreen
 import com.example.appmoview.presentation.screens.SearchScreen
 import com.example.appmoview.presentation.screens.SeatBookingScreen
@@ -22,19 +20,15 @@ import com.example.appmoview.presentation.screens.ShowtimeScreen
 import com.example.appmoview.presentation.screens.SplashScreen
 import com.example.appmoview.presentation.viewmodels.MovieViewModel
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(navController: NavHostController) {
     val viewModel: MovieViewModel = viewModel()
-    NavHost(navController = navController, startDestination = "bookingHistory") {
+    NavHost(navController = navController, startDestination = "splash") {
         composable("splash") { SplashScreen(navController) }
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }
         composable("home") { HomeScreen1(navController) }
         composable("search") { SearchScreen(navController) }
-        composable("account") { AccountScreen(navController, onLogout = { navController.navigate("login") }) }
-        composable("showAllFilm") { ShowAllFilm(navController) }
-        composable("bookingHistory"){ ListTicketScreen(navController) }
         composable(
             route = "detail/{movieId}",
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })
@@ -52,6 +46,10 @@ fun AppNavigation(navController: NavHostController) {
         composable("seat_booking_screen") {
             val movieId = it.arguments?.getInt("movieId") ?: -1
             SeatBookingScreen(movieId = movieId, viewModel = viewModel, navController = navController)
+        }
+        composable("payment_screen") {
+            val movieId = it.arguments?.getInt("movieId") ?: -1
+            PaymentScreen(movieId = movieId, viewModel = viewModel, navController = navController)
         }
     }
 }

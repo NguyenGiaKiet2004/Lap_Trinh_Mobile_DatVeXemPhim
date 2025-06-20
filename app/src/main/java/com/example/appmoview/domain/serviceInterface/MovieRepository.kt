@@ -24,7 +24,7 @@ interface MovieRepository {
 
     fun createBooking(
         bookingRequest: BookingRequest,
-        onResult: (Boolean, String, Int?) -> Unit
+        onResult: (Boolean, String) -> Unit
     )
 
     fun callFakePayment(bookingId: Int)

@@ -178,7 +178,6 @@ fun PaymentScreen(
     LaunchedEffect(bookingResult) {
         bookingResult?.let { (success, message) ->
             isLoading = false // Tắt loading sau khi có kết quả
-
             if (success) {
                 navController.navigate("success_screen") {
                     popUpTo(0) { inclusive = true }
