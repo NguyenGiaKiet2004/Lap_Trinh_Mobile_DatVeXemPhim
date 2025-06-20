@@ -5,6 +5,7 @@ import com.example.appmoview.domain.model.ApiResponse
 import com.example.appmoview.domain.model.BookingRequest
 import com.example.appmoview.domain.model.MovieDetail
 import com.example.appmoview.domain.model.MovieRequest
+import com.example.appmoview.domain.model.PaymentRequest
 import com.example.appmoview.domain.model.Showtime
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -34,5 +35,7 @@ interface MovieApi {
     @POST("booking/create")
     fun createBooking(@Body bookingRequest: BookingRequest): Call<ResponseBody>
 
+    @POST("payment/fake")
+    fun makeFakePayment(@Body request: PaymentRequest): Call<Void>
 
 }
