@@ -54,7 +54,7 @@ class AuthRepositoryImpl(private val context: Context) : AuthRepository {
                                 .putString("user_id", userId)
                                 .apply()
                         } else {
-                            Log.e("LoginRepository", "Đăng nhập thất bại")
+                            Log.e("LoginRepository", "Sai tên người dùng hoặc mật khẩu")
                             _loginStatus.value = false
                         }
                     } else {

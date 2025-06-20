@@ -1,6 +1,7 @@
 package com.example.appmoview.data.repository
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.appmoview.data.source.retrofit.RetrofitClient
@@ -128,20 +129,27 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
             .enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                     _isLoading.value = false
+                    val rawJson = response.errorBody()?.string()
+                    Log.d("DEBUG_API", "Code: ${response.code()}")
+                    Log.d("DEBUG_API", "Success: ${response.isSuccessful}")
+                    Log.d("DEBUG_API", "Body: ${response.body()?.string()}")
+                    Log.d("DEBUG_API", "ErrorBody: $rawJson")
+
                     if (response.isSuccessful) {
-                        val message = response.body()?.string() ?: "Đặt vé thành công"
-                        onResult(true, message)
+                        onResult(true, "Đặt vé thành công")
                     } else {
-                        onResult(false, "Đặt vé thất bại (${response.code()})")
+                        onResult(false, "Đặt vé thất bại (${response.code()}): $rawJson")
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     _isLoading.value = false
+                    Log.e("DEBUG_API", "Failure: ${t.message}")
                     onResult(false, "Lỗi kết nối: ${t.localizedMessage}")
                 }
             })
     }
+
 
 
 
