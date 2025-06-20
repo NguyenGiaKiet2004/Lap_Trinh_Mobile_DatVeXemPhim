@@ -137,15 +137,20 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
                         try {
                             val json = JSONObject(bodyString)
                             val bookingId = json.getInt("booking_id")
+                            Log.d("Payment", "Thanh toán giả thành công: $bookingId")
                             callFakePayment(bookingId)
                             onResult(true, "Đặt vé thành công")
                         } catch (e: Exception) {
+                            Log.e("Booking", "Lỗi parse JSON: ${e.localizedMessage}")
                             onResult(false, "Đặt vé thành công nhưng không đọc được booking_id")
                         }
                     } else {
+                        val errorBody = response.errorBody()?.string()
+                        Log.e("Booking", "Lỗi từ server: ${response.code()} - $errorBody")
                         onResult(false, "Đặt vé thất bại (${response.code()})")
                     }
                 }
+
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     _isLoading.value = false

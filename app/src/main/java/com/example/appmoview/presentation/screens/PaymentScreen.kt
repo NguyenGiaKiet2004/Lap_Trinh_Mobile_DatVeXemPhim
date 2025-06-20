@@ -147,8 +147,6 @@ fun PaymentScreen(
                 onClick = {
                     val sharedPref = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
                     val userId = sharedPref.getString("user_id", null)?.toIntOrNull()
-
-                    Toast.makeText(context, "Th $userId", Toast.LENGTH_SHORT).show()
                     if (userId != null && selectedShowtime != null) {
                         isLoading = true
                         viewModel.createBooking(userId, selectedShowtime!!.showtimeId, seatIds)

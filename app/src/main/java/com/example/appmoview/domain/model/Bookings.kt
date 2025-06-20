@@ -6,6 +6,7 @@ data class BookingRequest(
     val seatIds: List<Int>
 )
 
+
 data class BookingIdResponse(
     val booking_id: Int
 )
