@@ -10,7 +10,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.appmoview.domain.model.BookingHistory
 import com.example.appmoview.presentation.screens.AccountScreen
 import com.example.appmoview.presentation.screens.DetailScreen
 import com.example.appmoview.presentation.screens.HomeScreen1
