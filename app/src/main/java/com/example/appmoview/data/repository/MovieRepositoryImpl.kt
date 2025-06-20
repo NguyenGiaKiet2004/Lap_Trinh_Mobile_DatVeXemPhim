@@ -137,6 +137,7 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
                         try {
                             val json = JSONObject(bodyString)
                             val bookingId = json.getInt("booking_id")
+                            Log.d("Payment", "Thanh toán giả thành công: $bookingId")
                             callFakePayment(bookingId)
                             onResult(true, "Đặt vé thành công")
                         } catch (e: Exception) {
