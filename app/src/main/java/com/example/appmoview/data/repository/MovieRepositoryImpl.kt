@@ -9,9 +9,11 @@ import com.example.appmoview.domain.model.ApiResponse
 import com.example.appmoview.domain.model.BookingRequest
 import com.example.appmoview.domain.model.MovieDetail
 import com.example.appmoview.domain.model.MovieRequest
+import com.example.appmoview.domain.model.PaymentRequest
 import com.example.appmoview.domain.model.Showtime
 import com.example.appmoview.domain.serviceInterface.MovieRepository
 import okhttp3.ResponseBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -121,7 +123,7 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
 
     override fun createBooking(
         bookingRequest: BookingRequest,
-        onResult: (Boolean, String) -> Unit
+        onResult: (Boolean, String, Int?) -> Unit
     ) {
         _isLoading.value = true
 
@@ -129,23 +131,41 @@ class MovieRepositoryImpl(private val context: Context) : MovieRepository {
             .enqueue(object : Callback<ResponseBody> {
                 override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                     _isLoading.value = false
-                    val rawJson = response.errorBody()?.string()
-                    Log.d("DEBUG_API", "Code: ${response.code()}")
-                    Log.d("DEBUG_API", "Success: ${response.isSuccessful}")
-                    Log.d("DEBUG_API", "Body: ${response.body()?.string()}")
-                    Log.d("DEBUG_API", "ErrorBody: $rawJson")
 
-                    if (response.isSuccessful) {
-                        onResult(true, "Đặt vé thành công")
+                    if (response.isSuccessful && response.body() != null) {
+                        val bodyString = response.body()!!.string()
+                        try {
+                            val json = JSONObject(bodyString)
+                            val bookingId = json.getInt("booking_id")
+                            callFakePayment(bookingId)
+                            onResult(true, "Đặt vé thành công", bookingId)
+                        } catch (e: Exception) {
+                            onResult(false, "Đặt vé thành công nhưng không đọc được booking_id", null)
+                        }
                     } else {
-                        onResult(false, "Đặt vé thất bại (${response.code()}): $rawJson")
+                        onResult(false, "Đặt vé thất bại (${response.code()})", null)
                     }
                 }
 
                 override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                     _isLoading.value = false
-                    Log.e("DEBUG_API", "Failure: ${t.message}")
-                    onResult(false, "Lỗi kết nối: ${t.localizedMessage}")
+                    onResult(false, "Lỗi kết nối: ${t.localizedMessage}", null)
+                }
+            })
+    }
+
+    override fun callFakePayment(bookingId: Int) {
+        val request = PaymentRequest(bookingId)
+
+        RetrofitClient.movieInstance.makeFakePayment(request)
+            .enqueue(object : Callback<Void> {
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    Log.d("Payment", "Thanh toán giả thành công: ${response.code()}")
+                    // Không cần xử lý gì thêm nếu không lấy kết quả
+                }
+
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    Log.e("Payment", "Lỗi khi gọi thanh toán giả: ${t.localizedMessage}")
                 }
             })
     }
