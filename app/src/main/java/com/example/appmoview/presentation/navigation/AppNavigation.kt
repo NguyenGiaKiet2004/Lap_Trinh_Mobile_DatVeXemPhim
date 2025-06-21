@@ -10,7 +10,6 @@ import androidx.navigation.navArgument
 import com.example.appmoview.presentation.screens.AccountScreen
 import com.example.appmoview.presentation.screens.DetailScreen
 import com.example.appmoview.presentation.screens.HomeScreen1
-import com.example.appmoview.presentation.screens.ListTicketScreen
 import com.example.appmoview.presentation.screens.LoginScreen
 import com.example.appmoview.presentation.screens.PaymentScreen
 import com.example.appmoview.presentation.screens.RegisterScreen

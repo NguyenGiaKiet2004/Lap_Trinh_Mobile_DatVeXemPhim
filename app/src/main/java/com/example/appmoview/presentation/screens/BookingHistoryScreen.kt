@@ -1,3 +1,4 @@
+/*
 package com.example.appmoview.presentation.screens
 
 import android.os.Build
@@ -34,6 +35,7 @@ import java.time.format.DateTimeFormatter
 
 
 
+*/
 /*fun isPastDate(dateStr: String): Boolean {
     return try {
         val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
@@ -42,7 +44,8 @@ import java.time.format.DateTimeFormatter
     } catch (e: Exception) {
         false // nếu lỗi định dạng thì coi như chưa qua
     }
-}*/
+}*//*
+
 
 @Composable
 fun ListTicketScreen(navController: NavController) {
@@ -110,7 +113,9 @@ fun ListTicketScreen(navController: NavController) {
                                 .fillMaxWidth()
                                 .padding(0.dp),
                             fontSize = 12.sp,
-                            color = if (/*isPastDate(booking.showDate)*/ true) Color.Red else Color.Green,
+                            color = if (*/
+/*isPastDate(booking.showDate)*//*
+ true) Color.Red else Color.Green,
                             textAlign = TextAlign.Right
                         )
                         Text(
@@ -175,3 +180,4 @@ fun ListTicketScreen(navController: NavController) {
     }
 }
 
+*/
