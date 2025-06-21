@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,7 +37,10 @@ val actionMovies = listOf(
 )
 
 @Composable
-fun ShowAllFilm(navController: NavController, films: List<Film> = actionMovies, categoryTitle: String = "Phim hành động") {
+fun ShowAllFilm(navController: NavController) {
+    val films: List<Film> = actionMovies
+    val categoryTitle: String = "Phim hành động"
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -43,12 +48,29 @@ fun ShowAllFilm(navController: NavController, films: List<Film> = actionMovies, 
             .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
+        // Nút back ở góc trái
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Back",
+                    tint = Color.White
+                )
+            }
+        }
+
+        // Tiêu đề
         Text(
             text = categoryTitle,
             color = Color.White,
             fontSize = 30.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(vertical = 30.dp)
+            modifier = Modifier.padding(vertical = 16.dp)
         )
 
         LazyColumn(
@@ -114,3 +136,4 @@ fun ShowAllFilm(navController: NavController, films: List<Film> = actionMovies, 
         }
     }
 }
+

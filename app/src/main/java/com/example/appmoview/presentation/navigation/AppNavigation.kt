@@ -1,5 +1,6 @@
 package com.example.appmoview.presentation.navigation
 
+import ShowAllFilm
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -30,6 +31,7 @@ fun AppNavigation(navController: NavHostController) {
         composable("home") { HomeScreen1(navController) }
         composable("search") { SearchScreen(navController) }
         composable("account") { AccountScreen(navController) }
+        composable("show") { ShowAllFilm(navController) }
         composable(
             route = "detail/{movieId}",
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })

@@ -319,7 +319,7 @@ fun PhimTheoTheLoai(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 10.dp)
             )
-            TextButton(onClick = { /* TODO: Xử lý khi nhấn "Xem tất cả" */ }) {
+            TextButton(onClick = { navController.navigate("show") }) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "Xem tất cả", color = Color.Yellow)
                     Icon(
