@@ -29,6 +29,7 @@ fun AppNavigation(navController: NavHostController) {
         composable("register") { RegisterScreen(navController) }
         composable("home") { HomeScreen1(navController) }
         composable("search") { SearchScreen(navController) }
+        composable("account") { AccountScreen(navController) }
         composable(
             route = "detail/{movieId}",
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })

@@ -73,7 +73,16 @@ fun HomeScreen1(navController: NavController) {
     androidx.compose.material.Scaffold(
         backgroundColor = Color.Black,
         bottomBar = {
-            BottomNavigationBar1() // Tách riêng thanh điều hướng
+            BottomNavigationBar1(
+                selectedIndex = 0, // Cá nhân được chọn
+                onItemSelected = { index ->
+                    when (index) {
+                        0 -> {}
+                        1 -> navController.navigate("ticket")
+                        2 -> navController.navigate("account")
+                    }
+                }
+            ) // Tách riêng thanh điều hướng
         }
     ) { paddingValues ->
         Column(
@@ -439,49 +448,61 @@ fun PhimTheoTheLoaiSkeleton(tieuDe: String) {
 
 
 @Composable
-fun BottomNavigationBar1() {
+fun BottomNavigationBar1(
+    selectedIndex: Int,
+    onItemSelected: (Int) -> Unit
+) {
     BottomNavigation(
-        backgroundColor = Color(0xFF2C2C2C), // Màu nền đậm hơn cho bottom nav
-        elevation = 8.dp // Độ nổi (shadow)
+        backgroundColor = Color(0xFF2C2C2C),
+        elevation = 8.dp
     ) {
         BottomNavigationItem(
             icon = {
                 Icon(
                     Icons.Default.Home,
                     contentDescription = "Home",
-                    tint = Color.White
+                    tint = if (selectedIndex == 0) Color.White else Color.Gray
                 )
             },
-            label = { Text("Trang chủ", color = Color.White) },
-            selected = true, // Đặt là true cho mục đang chọn (Trang chủ)
-            onClick = { /* Handle home click */ }
+            label = {
+                Text("Trang chủ", color = if (selectedIndex == 0) Color.White else Color.Gray)
+            },
+            selected = selectedIndex == 0,
+            onClick = { onItemSelected(0) }
         )
+
         BottomNavigationItem(
             icon = {
                 Icon(
-                    painter = painterResource(id = R.drawable.outline_ballot_24), // Biểu tượng vé (cần tạo trong drawable)
+                    painter = painterResource(id = R.drawable.outline_ballot_24),
                     contentDescription = "Tickets",
-                    tint = Color.Gray // Màu xám cho mục không chọn
+                    tint = if (selectedIndex == 1) Color.White else Color.Gray
                 )
             },
-            label = { Text("Vé", color = Color.Gray) },
-            selected = false,
-            onClick = { /* Handle tickets click */ }
+            label = {
+                Text("Vé", color = if (selectedIndex == 1) Color.White else Color.Gray)
+            },
+            selected = selectedIndex == 1,
+            onClick = { onItemSelected(1) }
         )
+
         BottomNavigationItem(
             icon = {
                 Icon(
                     Icons.Default.Person,
                     contentDescription = "Profile",
-                    tint = Color.Gray
+                    tint = if (selectedIndex == 2) Color.White else Color.Gray
                 )
             },
-            label = { Text("Cá nhân", color = Color.Gray) },
-            selected = false,
-            onClick = { /* Handle profile click */ }
+            label = {
+                Text("Cá nhân", color = if (selectedIndex == 2) Color.White else Color.Gray)
+            },
+            selected = selectedIndex == 2,
+            onClick = { onItemSelected(2) }
         )
     }
 }
+
 
 /*@Composable
 fun SlideShow() {
