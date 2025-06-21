@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.appmoview.R
+import com.example.appmoview.utils.logout
 
 @Composable
 fun AccountScreen(navController: NavController) {
@@ -65,8 +66,12 @@ fun AccountScreen(navController: NavController) {
                 selectedIndex = 2, // Cá nhân được chọn
                 onItemSelected = { index ->
                     when (index) {
-                        0 -> navController.navigate("home") // chuyển sang Home
-                        1 -> navController.navigate("ticket")
+                        0 -> navController.navigate("home") {
+                            popUpTo(0) { inclusive = true }
+                        } // chuyển sang Home
+                        1 -> navController.navigate("ticket") {
+                            popUpTo(0) { inclusive = true }
+                        }
                         2 -> {} // đang ở Cá nhân
                     }
                 }
@@ -142,6 +147,29 @@ fun AccountScreen(navController: NavController) {
                 onPhoneChange = { phoneNumber = it },
                 onAddressChange = { address = it }
             )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Button(
+                onClick = {
+                    // Ví dụ: clear SharedPreferences và chuyển về màn hình đăng nhập
+                    logout(context)
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Red,
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 40.dp)
+                    .height(60.dp)
+            ) {
+                Text("Đăng xuất", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
