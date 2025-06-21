@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.appmoview.R
 import com.example.appmoview.domain.model.MovieRequest
@@ -73,7 +74,7 @@ fun HomeScreen1(navController: NavController) {
     androidx.compose.material.Scaffold(
         backgroundColor = Color.Black,
         bottomBar = {
-            BottomNavigationBar1() // Tách riêng thanh điều hướng
+            BottomNavigationBar1(navController) // Tách riêng thanh điều hướng
         }
     ) { paddingValues ->
         Column(
@@ -82,7 +83,7 @@ fun HomeScreen1(navController: NavController) {
                 .padding(paddingValues) // Thêm padding từ Scaffold để tránh bị đè
         ) {
 
-            TimKiem()
+            TimKiem(navController)
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
@@ -98,16 +99,30 @@ fun HomeScreen1(navController: NavController) {
                 }
                 item {
                     if (isLoading) {
-                        PhimTheoTheLoaiSkeleton("Phim hành động")
+                        PhimTheoTheLoaiSkeleton("Phim hành động",navController)
                     } else {
                         PhimTheoTheLoai("Phim hành động", getActMovie(movies),navController)
                     }
                 }
                 item {
                     if (isLoading) {
-                        PhimTheoTheLoaiSkeleton("Phim hoạt hình")
+                        PhimTheoTheLoaiSkeleton("Phim hoạt hình",navController)
                     } else {
                         PhimTheoTheLoai("Phim hoạt hình", getAnimeMovie(movies),navController)
+                    }
+                }
+                item {
+                    if (isLoading) {
+                        PhimTheoTheLoaiSkeleton("Phim học đường",navController)
+                    } else {
+                        PhimTheoTheLoai("Phim học đường", getAnimeMovie(movies),navController)
+                    }
+                }
+                item {
+                    if (isLoading) {
+                        PhimTheoTheLoaiSkeleton("Phim drama Hàn Quốc",navController)
+                    } else {
+                        PhimTheoTheLoai("Phim drama Hàn Quốc", getAnimeMovie(movies),navController)
                     }
                 }
             }
@@ -121,7 +136,7 @@ fun navigation(navController: NavController,id:Int){
 
 
 @Composable
-fun TimKiem() {
+fun TimKiem(navController : NavController) {
     val context = LocalContext.current
 
     // Đọc username từ SharedPreferences
@@ -145,7 +160,7 @@ fun TimKiem() {
             fontWeight = FontWeight.Bold
         )
         IconButton(
-            onClick = {},
+            onClick = {navController.navigate("search") },
             modifier = Modifier
                 .background(Color.DarkGray, shape = RoundedCornerShape(25.dp))
         ) {
@@ -310,7 +325,7 @@ fun PhimTheoTheLoai(
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 10.dp)
             )
-            TextButton(onClick = { /* TODO: Xử lý khi nhấn "Xem tất cả" */ }) {
+            TextButton(onClick = {navController.navigate("show_all_film")}) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(text = "Xem tất cả", color = Color.Yellow)
                     Icon(
@@ -368,7 +383,7 @@ fun PhimTheoTheLoai(
 }
 
 @Composable
-fun PhimTheoTheLoaiSkeleton(tieuDe: String) {
+fun PhimTheoTheLoaiSkeleton(tieuDe: String,navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -390,9 +405,9 @@ fun PhimTheoTheLoaiSkeleton(tieuDe: String) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(start = 10.dp)
             )
-            TextButton(onClick = { }) {
+            TextButton(onClick = {navController.navigate("show_all_film")}) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Xem tất cả", color = Color.Yellow)
+                    Text(text = "Xem tất cả", color = Color.Blue)
                     Icon(
                         painter = painterResource(id = R.drawable.outline_keyboard_arrow_right_24),
                         contentDescription = null,
@@ -439,7 +454,7 @@ fun PhimTheoTheLoaiSkeleton(tieuDe: String) {
 
 
 @Composable
-fun BottomNavigationBar1() {
+fun BottomNavigationBar1(navController: NavController) {
     BottomNavigation(
         backgroundColor = Color(0xFF2C2C2C), // Màu nền đậm hơn cho bottom nav
         elevation = 8.dp // Độ nổi (shadow)
@@ -466,7 +481,9 @@ fun BottomNavigationBar1() {
             },
             label = { Text("Vé", color = Color.Gray) },
             selected = false,
-            onClick = { /* Handle tickets click */ }
+            onClick = {
+                navController.navigate("BookingHistory")
+            }
         )
         BottomNavigationItem(
             icon = {
@@ -478,7 +495,7 @@ fun BottomNavigationBar1() {
             },
             label = { Text("Cá nhân", color = Color.Gray) },
             selected = false,
-            onClick = { /* Handle profile click */ }
+            onClick = {navController.navigate("account") }
         )
     }
 }

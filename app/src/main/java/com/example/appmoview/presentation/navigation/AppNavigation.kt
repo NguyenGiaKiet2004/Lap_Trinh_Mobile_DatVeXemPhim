@@ -1,5 +1,6 @@
 package com.example.appmoview.presentation.navigation
 
+import ShowAllFilm
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -7,9 +8,13 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.appmoview.domain.model.BookingHistory
 import com.example.appmoview.presentation.screens.AccountScreen
+import com.example.appmoview.presentation.screens.AccountScreen1
 import com.example.appmoview.presentation.screens.DetailScreen
 import com.example.appmoview.presentation.screens.HomeScreen1
+import com.example.appmoview.presentation.screens.ListTicketScreen
+import com.example.appmoview.presentation.screens.ListTicketScreen1
 import com.example.appmoview.presentation.screens.LoginScreen
 import com.example.appmoview.presentation.screens.PaymentScreen
 import com.example.appmoview.presentation.screens.RegisterScreen
@@ -29,6 +34,12 @@ fun AppNavigation(navController: NavHostController) {
         composable("register") { RegisterScreen(navController) }
         composable("home") { HomeScreen1(navController) }
         composable("search") { SearchScreen(navController) }
+        composable("show_all_film") { ShowAllFilm(navController) }
+        composable("BookingHistory"){ ListTicketScreen1(navController) }
+        composable("account") {
+            AccountScreen1(navController, onLogout = { navController.navigate("login") })
+        }
+
         composable(
             route = "detail/{movieId}",
             arguments = listOf(navArgument("movieId") { type = NavType.IntType })

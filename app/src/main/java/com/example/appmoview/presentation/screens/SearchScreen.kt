@@ -187,7 +187,7 @@ Column(
             .padding(16.dp),
     ) {
         IconButton(
-            onClick = {},
+            onClick = {navController.popBackStack()},
         ) {
             Image(
                 painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
