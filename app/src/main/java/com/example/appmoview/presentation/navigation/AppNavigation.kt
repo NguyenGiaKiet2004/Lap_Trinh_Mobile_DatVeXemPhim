@@ -8,7 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.example.appmoview.presentation.screens.AccountScreen
+import com.example.appmoview.presentation.screens.AccountScreen2
 import com.example.appmoview.presentation.screens.DetailScreen
 import com.example.appmoview.presentation.screens.HomeScreen1
 import com.example.appmoview.presentation.screens.LoginScreen
@@ -30,7 +30,7 @@ fun AppNavigation(navController: NavHostController) {
         composable("register") { RegisterScreen(navController) }
         composable("home") { HomeScreen1(navController) }
         composable("search") { SearchScreen(navController) }
-        composable("account") { AccountScreen(navController) }
+        composable("account") { AccountScreen2(navController) }
         composable("show") { ShowAllFilm(navController) }
         composable(
             route = "detail/{movieId}",
