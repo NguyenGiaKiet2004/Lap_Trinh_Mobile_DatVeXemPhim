@@ -1,26 +1,25 @@
 package com.example.appmoview.presentation.screens
 
+import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.*
-import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,26 +27,208 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.appmoview.R
-import com.example.appmoview.presentation.viewmodels.UserViewModel
+import com.example.appmoview.utils.logout
 
 @Composable
-fun AccountScreen(navController: NavController,userViewModel: UserViewModel = viewModel(),onLogout: ()-> Unit) {
+fun AccountScreen(navController: NavController) {
+    val context = LocalContext.current
+
+    val sharedPref = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+    val savedUsername = sharedPref.getString("username", "Người dùng")
+
+    var fullName by remember { mutableStateOf(savedUsername ?: "Người dùng") }
+    var email by remember { mutableStateOf("vana@example.com") }
+    var phoneNumber by remember { mutableStateOf("0123456789") }
+    var address by remember { mutableStateOf("403/52/98 Tân Chánh Hiệp, Quận 12") }
+
+    var isEditing by remember { mutableStateOf(false) }
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        imageUri = uri
+    }
+
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar1(
+                selectedIndex = 2, // Cá nhân được chọn
+                onItemSelected = { index ->
+                    when (index) {
+                        0 -> navController.navigate("home") {
+                            popUpTo(0) { inclusive = true }
+                        } // chuyển sang Home
+                        1 -> navController.navigate("ticket") {
+                            popUpTo(0) { inclusive = true }
+                        }
+                        2 -> {} // đang ở Cá nhân
+                    }
+                }
+            )
+        },
+        containerColor = Color.Black
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .statusBarsPadding(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Thông tin tài khoản",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                textAlign = TextAlign.Center
+            )
+
+            // Avatar
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(CircleShape)
+                    .clickable { launcher.launch("image/*") }
+                    .background(Color.Gray),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (imageUri != null) {
+                    AsyncImage(
+                        model = imageUri,
+                        contentDescription = "Avatar",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = "Default Avatar",
+                        modifier = Modifier.size(150.dp),
+                        tint = Color.White
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Thông tin người dùng
+            InformationPerson(
+                fullName = fullName,
+                email = email,
+                phone = phoneNumber,
+                address = address,
+                isEditing = isEditing,
+                onEdit = { isEditing = true },
+                onCancel = {
+                    isEditing = false
+                    fullName = savedUsername ?: "Người dùng"
+                    phoneNumber = "0123456789"
+                    address = "403/52/98 Tân Chánh Hiệp, Quận 12"
+                },
+                onSave = {
+                    Toast.makeText(context, "Đã lưu thông tin mới", Toast.LENGTH_SHORT).show()
+                    isEditing = false
+                },
+                onFullNameChange = { fullName = it },
+                onPhoneChange = { phoneNumber = it },
+                onAddressChange = { address = it }
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+
+            Button(
+                onClick = {
+                    // Ví dụ: clear SharedPreferences và chuyển về màn hình đăng nhập
+                    logout(context)
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.Red,
+                    contentColor = Color.White
+                ),
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 40.dp)
+                    .height(60.dp)
+            ) {
+                Text("Đăng xuất", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
+fun BottomNavigationBar1() {
+    BottomNavigation(
+        backgroundColor = Color(0xFF2C2C2C), // Màu nền đậm hơn cho bottom nav
+        elevation = 8.dp // Độ nổi (shadow)
+    ) {
+        BottomNavigationItem(
+            icon = {
+                Icon(
+                    Icons.Default.Home,
+                    contentDescription = "Home",
+                    tint = Color.White
+                )
+            },
+            label = { Text("Trang chủ", color = Color.White) },
+            selected = true, // Đặt là true cho mục đang chọn (Trang chủ)
+            onClick = { /* Handle home click */ }
+        )
+        BottomNavigationItem(
+            icon = {
+                Icon(
+                    painter = painterResource(id = R.drawable.outline_ballot_24), // Biểu tượng vé (cần tạo trong drawable)
+                    contentDescription = "Tickets",
+                    tint = Color.Gray // Màu xám cho mục không chọn
+                )
+            },
+            label = { Text("Vé", color = Color.Gray) },
+            selected = false,
+            onClick = { /* Handle tickets click */ }
+        )
+        BottomNavigationItem(
+            icon = {
+                Icon(
+                    Icons.Default.Person,
+                    contentDescription = "Profile",
+                    tint = Color.Gray
+                )
+            },
+            label = { Text("Cá nhân", color = Color.Gray) },
+            selected = false,
+            onClick = { /* Handle profile click */ }
+        )
+    }
+}
+
+
+
+// bản load
+/*@Composable
+fun AccountScreen(navController: NavController) {
+
     val colorScheme = MaterialTheme.colorScheme
     val context = LocalContext.current
 
+    val userViewModel: UserViewModel = viewModel()
     val userProfile by userViewModel.userProfile.observeAsState()
     val updateStatus by userViewModel.updateStatus.observeAsState()
 
@@ -87,7 +268,7 @@ fun AccountScreen(navController: NavController,userViewModel: UserViewModel = vi
                 userViewModel.onUpdateStatusShown()
             }
 
-            null -> { /* Do nothing */
+            null -> { *//* Do nothing *//*
             }
         }
     }
@@ -172,7 +353,10 @@ fun AccountScreen(navController: NavController,userViewModel: UserViewModel = vi
             }
         }
     }
-}
+}*/
+
+
+
     @Composable
     fun AvatarPicker() {
         val context = LocalContext.current
