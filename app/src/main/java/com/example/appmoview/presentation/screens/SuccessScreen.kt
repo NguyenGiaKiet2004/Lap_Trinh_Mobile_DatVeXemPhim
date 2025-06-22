@@ -129,7 +129,10 @@ fun SuccessScreen(
 
         // Nút XEM VÉ
         Button(
-            onClick = { /* xử lý xem vé */ },
+            onClick = { viewModel.resetAllData()
+                navController.navigate("ticket") {
+                    popUpTo(0) { inclusive = true }
+                } },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),

@@ -111,13 +111,26 @@ fun ListTicketScreen1(
                 selectedIndex = 1,
                 onItemSelected = { index ->
                     when (index) {
-                        0 -> navController.popBackStack()
-                        1 -> {} // Đang ở màn vé
-                        2 -> navController.navigate("account") {
-                            popUpTo("ticket") { inclusive = true }
+                        0 -> {
+                            if (navController.previousBackStackEntry != null) {
+                                navController.popBackStack()
+                            } else {
+                                navController.navigate("home") {
+                                    popUpTo(0) { inclusive = true } // Xóa hết stack
+                                }
+                            }
+                        }
+                        1 -> {
+                            // Đang ở màn vé - không làm gì
+                        }
+                        2 -> {
+                            navController.navigate("account") {
+                                popUpTo("ticket") { inclusive = true }
+                            }
                         }
                     }
                 }
+
             )
         },
         containerColor = Color.Black
