@@ -1,22 +1,37 @@
 package com.example.appmoview.presentation.screens
 
+//for Date
 import android.content.Context
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.Divider
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,17 +41,8 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appmoview.R
-import androidx.compose.runtime.getValue//for by
 import com.example.appmoview.presentation.viewmodels.BookingViewModel
-import androidx.compose.foundation.lazy.items//for items
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import java.text.SimpleDateFormat
-
-//for Date
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -50,6 +56,15 @@ fun isPastDate(dateStr: String): Boolean {
         false // nếu lỗi định dạng thì coi như chưa qua
     }
 }
+
+data class Booking(
+    val id: Int,
+    val movieName: String,
+    val movieType: String,
+    val duration: String,
+    val showDate: String,
+    val showTime: String
+)
 
 
 @Composable
@@ -66,7 +81,7 @@ fun ListTicketScreen(navController: NavController,viewModel: BookingViewModel = 
     // Gọi API nếu userId hợp lệ
     LaunchedEffect(Unit) {
         if (userId != -1) {
-            viewModel.loadBookings(userId)
+            /*iewModel.loadBookings(userId)*/
         } else {
             Log.e("ListTicketScreen", "Không tìm thấy userId")
         }

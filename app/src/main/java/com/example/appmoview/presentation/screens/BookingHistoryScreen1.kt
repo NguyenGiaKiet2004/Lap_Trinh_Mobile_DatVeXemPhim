@@ -1,20 +1,29 @@
 package com.example.appmoview.presentation.screens
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,193 +31,245 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.appmoview.R
+import com.example.appmoview.presentation.viewmodels.BookingViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-// Hàm kiểm tra ngày đã qua
+fun getShowDate(startTime: String): String {
+    return try {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val date = sdf.parse(startTime)
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(date!!)
+    } catch (e: Exception) {
+        ""
+    }
+}
+
+fun getShowTime(startTime: String): String {
+    return try {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val date = sdf.parse(startTime)
+        SimpleDateFormat("HH:mm", Locale.getDefault()).format(date!!)
+    } catch (e: Exception) {
+        ""
+    }
+}
+
+fun getDuration(start: String, end: String): String {
+    return try {
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val startDate = sdf.parse(start)
+        val endDate = sdf.parse(end)
+        val durationInMillis = endDate!!.time - startDate!!.time
+        val minutes = durationInMillis / (1000 * 60)
+        "$minutes phút"
+    } catch (e: Exception) {
+        ""
+    }
+}
+
 fun isPastDate1(dateStr: String): Boolean {
     return try {
         val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val date = sdf.parse(dateStr)
         date?.before(Date()) ?: false
     } catch (e: Exception) {
-        false // Nếu lỗi định dạng, coi như chưa qua
+        false
     }
 }
 
-// Định nghĩa dữ liệu mẫu cho vé xem phim
-data class Booking(
-    val id: Int,
-    val movieName: String,
-    val movieType: String,
-    val duration: String,
-    val showDate: String,
-    val showTime: String
-)
-
 @Composable
-fun ListTicketScreen1(navController: NavController) {
-    // Định nghĩa danh sách mẫu
-    val mockBookings = remember {
-        listOf(
-            Booking(
-                id = 1,
-                movieName = "Avengers: Endgame",
-                movieType = "Action",
-                duration = "2h 41m",
-                showDate = "20/07/2025",
-                showTime = "19:30"
-            ),
-            Booking(
-                id = 2,
-                movieName = "The Lion King",
-                movieType = "Animation",
-                duration = "1h 58m",
-                showDate = "04/07/2025",
-                showTime = "14:00"
-            ),
-            Booking(
-                id = 3,
-                movieName = "Inception",
-                movieType = "Sci-Fi",
-                duration = "2h 28m",
-                showDate = "15/06/2025",
-                showTime = "21:00"
-            )
-        )
-    }
+fun ListTicketScreen1(
+    navController: NavController,
+) {
+    val viewModel: BookingViewModel = viewModel()
+    val bookings by viewModel.rawBookings.observeAsState(emptyList())
+    val isLoading by viewModel.isLoading.observeAsState(false)
+    val error by viewModel.errorMessage.observeAsState("")
 
     val context = LocalContext.current
+    val sharedPref = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
+    val userid = sharedPref.getString("user_id", "-1")!!.toIntOrNull()
+
+    LaunchedEffect(Unit) {
+        viewModel.loadBookings(userid!!)
+    }
+
     val colorScheme = MaterialTheme.colorScheme
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.Black)
-            .padding(top = 40.dp)
-    ) {
-        Box(
+    Scaffold(
+        bottomBar = {
+            BottomNavigationBar1(
+                selectedIndex = 1,
+                onItemSelected = { index ->
+                    when (index) {
+                        0 -> navController.popBackStack()
+                        1 -> {} // Đang ở màn vé
+                        2 -> navController.navigate("account") {
+                            popUpTo("ticket") { inclusive = true }
+                        }
+                    }
+                }
+            )
+        },
+        containerColor = Color.Black
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+                .fillMaxSize()
+                .padding(innerPadding)
+                .background(Color.Black)
         ) {
-            IconButton(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier.align(Alignment.CenterStart)
+            // Header
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
-                    contentDescription = "Back",
-                    modifier = Modifier.size(24.dp),
-                    colorFilter = ColorFilter.tint(colorScheme.onSurface)
+                IconButton(
+                    onClick = { navController.popBackStack() },
+                    modifier = Modifier.align(Alignment.CenterStart)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
+                        contentDescription = "Back",
+                        modifier = Modifier.size(24.dp),
+                        colorFilter = ColorFilter.tint(colorScheme.onSurface)
+                    )
+                }
+
+                Text(
+                    text = "Lịch sử đặt vé",
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = colorScheme.onSurface,
+                    modifier = Modifier.align(Alignment.Center),
+                    textAlign = TextAlign.Center
                 )
             }
 
-            Text(
-                text = "Lịch sử đặt vé",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = colorScheme.onSurface,
-                modifier = Modifier.align(Alignment.Center),
-                textAlign = TextAlign.Center
-            )
-        }
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    color = Color.White
+                )
+            }
 
-        // Hiển thị danh sách vé
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(mockBookings) { booking ->
-                Box(
+            if (error.isNotEmpty()) {
+                Text(
+                    text = error,
+                    color = Color.Red,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp, horizontal = 20.dp)
-                        .height(150.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Color.DarkGray)
-                ) {
-                    Column(
+                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+
+            LazyColumn(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(bookings) { booking ->
+                    val date = getShowDate(booking.start_time)
+                    val time = getShowTime(booking.start_time)
+                    val duration = getDuration(booking.start_time, booking.end_time)
+
+                    Box(
                         modifier = Modifier
-                            .padding(top = 5.dp, start = 10.dp, end = 10.dp)
-                            .fillMaxSize()
+                            .fillMaxWidth()
+                            .padding(vertical = 16.dp, horizontal = 20.dp)
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(20.dp))
+                            .background(Color.DarkGray)
                     ) {
-                        Text(
-                            text = booking.showDate,
+                        Column(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(0.dp),
-                            fontSize = 12.sp,
-                            color = if (isPastDate1(booking.showDate)) Color.Red else Color.Green,
-                            textAlign = TextAlign.Right
-                        )
-                        Text(
-                            text = booking.movieName,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = colorScheme.onSurface,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-
-                        Text(
-                            text = booking.movieType,
-                            fontSize = 14.sp,
-                            color = colorScheme.onSurface,
-                            modifier = Modifier
-                                .padding(top = 6.dp)
-                                .fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-
-                        Divider(
-                            color = Color.White,
-                            thickness = 1.dp,
-                            modifier = Modifier.padding(vertical = 10.dp)
-                        )
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 15.dp),
+                                .padding(top = 5.dp, start = 10.dp, end = 10.dp)
+                                .fillMaxSize()
                         ) {
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally
+                            Text(
+                                text = date,
+                                modifier = Modifier.fillMaxWidth(),
+                                fontSize = 12.sp,
+                                color = if (isPastDate1(date)) Color.Red else Color.Green,
+                                textAlign = TextAlign.Right
+                            )
+                            Text(
+                                text = "Mã phim ${booking.showtime_id}",
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = colorScheme.onSurface,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+                            Text(
+                                text = "Phòng ${booking.room_id}",
+                                fontSize = 14.sp,
+                                color = colorScheme.onSurface,
+                                modifier = Modifier
+                                    .padding(top = 6.dp)
+                                    .fillMaxWidth(),
+                                textAlign = TextAlign.Center
+                            )
+
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 10.dp),
+                                thickness = 1.dp,
+                                color = Color.White
+                            )
+
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 15.dp),
                             ) {
-                                Text(stringResource(id = R.string.id_phim), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                                Text("${booking.id}", color = colorScheme.onSurface)
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text("ID Vé", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
+                                    Text("${booking.booking_id}", color = colorScheme.onSurface)
+                                }
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text("Thời lượng", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
+                                    Text(duration, color = colorScheme.onSurface)
+                                }
+                                Column(
+                                    modifier = Modifier.weight(1f),
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text("Giờ chiếu", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
+                                    Text(time, color = colorScheme.onSurface)
+                                }
                             }
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(stringResource(id = R.string.thoi_luong), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                                Text(booking.duration, color = colorScheme.onSurface)
-                            }
-                            Column(
-                                modifier = Modifier.weight(1f),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                Text(stringResource(id = R.string.gio_chieu), fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
-                                Text(booking.showTime, color = colorScheme.onSurface)
-                            }
+
+                            HorizontalDivider(
+                                modifier = Modifier.padding(vertical = 10.dp),
+                                thickness = 1.dp,
+                                color = Color.White
+                            )
+
+                            Text(
+                                text = "Giá: ${booking.price} VNĐ",
+                                fontSize = 14.sp,
+                                color = colorScheme.onSurface,
+                                modifier = Modifier.align(Alignment.End)
+                            )
                         }
-                        Divider(
-                            color = Color.White,
-                            thickness = 1.dp,
-                            modifier = Modifier.padding(vertical = 10.dp)
-                        )
                     }
                 }
             }
         }
     }
 }
+

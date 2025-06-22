@@ -9,10 +9,11 @@ class BookingViewModel(application: Application) : AndroidViewModel(application)
     private val repository = BookingRepositoryImpl(application.applicationContext)
 
     val bookings = repository.bookings
+    val rawBookings = repository.rawBookings
     val isLoading = repository.isLoading
     val errorMessage = repository.errorMessage
 
-    fun loadBookings(userId: Int) {
+    fun loadBookings(userId:Int) {
         repository.fetchBookingHistory(userId)
     }
 }
