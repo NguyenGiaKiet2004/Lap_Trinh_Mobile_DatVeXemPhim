@@ -229,7 +229,7 @@ fun ListTicketScreen1(
                                     modifier = Modifier.weight(1f),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text("ID Vé", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
+                                    Text("Mã đặt", fontWeight = FontWeight.SemiBold, color = colorScheme.onSurface)
                                     Text("${booking.booking_id}", color = colorScheme.onSurface)
                                 }
                                 Column(

@@ -91,7 +91,7 @@ fun HomeScreen1(navController: NavController) {
                 .padding(paddingValues) // Thêm padding từ Scaffold để tránh bị đè
         ) {
 
-            TimKiem()
+            TimKiem(navController)
 
             LazyColumn(
                 modifier = Modifier.fillMaxSize()
@@ -130,7 +130,7 @@ fun navigation(navController: NavController,id:Int){
 
 
 @Composable
-fun TimKiem() {
+fun TimKiem(navController: NavController) {
     val context = LocalContext.current
 
     // Đọc username từ SharedPreferences
@@ -143,7 +143,8 @@ fun TimKiem() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .padding(top = 50.dp),
+            .padding(top = 50.dp)
+            .clickable{ navController.navigate("account") },
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -154,7 +155,7 @@ fun TimKiem() {
             fontWeight = FontWeight.Bold
         )
         IconButton(
-            onClick = {},
+            onClick = { navController.navigate("search") },
             modifier = Modifier
                 .background(Color.DarkGray, shape = RoundedCornerShape(25.dp))
         ) {
