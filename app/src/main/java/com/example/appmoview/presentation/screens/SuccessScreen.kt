@@ -103,26 +103,9 @@ fun SuccessScreen(
                 fontSize = 14.sp
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(22.dp))
 
-            // Các thông tin ID, thời lượng, giờ chiếu
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("ID", color = Color.Gray, fontSize = 14.sp)
-                    Text("1002472", color = Color.White, fontSize = 14.sp)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Thời lượng", color = Color.Gray, fontSize = 14.sp)
-                    Text("1h:38min", color = Color.White, fontSize = 14.sp)
-                }
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Giờ chiếu", color = Color.Gray, fontSize = 14.sp)
-                    Text("23h", color = Color.White, fontSize = 14.sp)
-                }
-            }
+
         }
 
         Spacer(modifier = Modifier.height(32.dp))

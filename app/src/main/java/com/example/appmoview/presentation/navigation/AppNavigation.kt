@@ -15,7 +15,7 @@ import com.example.appmoview.presentation.screens.ListTicketScreen1
 import com.example.appmoview.presentation.screens.LoginScreen
 import com.example.appmoview.presentation.screens.PaymentScreen
 import com.example.appmoview.presentation.screens.RegisterScreen
-import com.example.appmoview.presentation.screens.SearchScreen
+import com.example.appmoview.presentation.screens.SearchScreen1
 import com.example.appmoview.presentation.screens.SeatBookingScreen
 import com.example.appmoview.presentation.screens.ShowtimeScreen
 import com.example.appmoview.presentation.screens.SplashScreen
@@ -30,7 +30,7 @@ fun AppNavigation(navController: NavHostController) {
         composable("login") { LoginScreen(navController) }
         composable("register") { RegisterScreen(navController) }
         composable("home") { HomeScreen1(navController) }
-        composable("search") { SearchScreen(navController) }
+        composable("search") { SearchScreen1(navController,viewModel) }
         composable("account") { AccountScreen2(navController) }
         composable("show") { ShowAllFilm(navController) }
         composable("ticket") { ListTicketScreen1(navController) }
