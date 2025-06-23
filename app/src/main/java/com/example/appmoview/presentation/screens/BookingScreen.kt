@@ -101,35 +101,28 @@ fun SeatBookingScreen(
             .background(colorScheme.background)
             .padding(16.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(top = 30.dp, bottom = 20.dp, start = 16.dp, end = 16.dp),
+            contentAlignment = Alignment.Center
         ) {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Image(
-                    painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
-                    contentDescription = "Back",
-                    modifier = Modifier.size(24.dp),
-                    colorFilter = ColorFilter.tint(colorScheme.onSurface)
-                )
-            }
+            Text(
+                text = "Chọn ghế",
+                color = colorScheme.onBackground,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
 
-            Box(
-                modifier = Modifier.weight(1f),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Chọn ghế",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = colorScheme.onSurface
-                )
-            }
-
-            Spacer(modifier = Modifier.width(48.dp))
+            Image(
+                painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
+                contentDescription = "Back",
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .size(24.dp)
+                    .clickable { navController.popBackStack() },
+                colorFilter = ColorFilter.tint(colorScheme.onSurface)
+            )
         }
 
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
