@@ -20,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +46,8 @@ import com.example.appmoview.R
 import com.example.appmoview.domain.model.Showtime
 import com.example.appmoview.presentation.viewmodels.MovieViewModel
 import com.example.appmoview.utils.ImageHelper
+import java.time.LocalDate
+
 
 @Composable
 fun ShowtimeScreen(movieId: Int,viewModel: MovieViewModel, navController: NavController) {
@@ -75,7 +76,12 @@ fun ShowtimeScreen(movieId: Int,viewModel: MovieViewModel, navController: NavCon
 
     val movie = movieDetail!!
     val grouped = filteredShowtimes.groupBy { it.startTime.substring(0, 10) }
-    val availableDates = grouped.keys.sorted()
+    val today = LocalDate.now()
+    val availableDates = grouped.keys
+        .mapNotNull { runCatching { LocalDate.parse(it) }.getOrNull() }
+        .filter { !it.isBefore(today) }
+        .sorted()
+        .map { it.toString() } // convert về String lại vì grouped dùng string key
     var selectedDate by remember { mutableStateOf(availableDates.firstOrNull() ?: "") }
     var selectedShowtime by remember { mutableStateOf<Showtime?>(null) }
 
@@ -111,7 +117,7 @@ fun ShowtimeScreen(movieId: Int,viewModel: MovieViewModel, navController: NavCon
                     painter = painterResource(id = R.drawable.baseline_arrow_back_ios_24),
                     contentDescription = "Back",
                     modifier = Modifier.size(24.dp),
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
+                    colorFilter = ColorFilter.tint(colorScheme.onSurface)
                 )
             }
         }
@@ -123,7 +129,7 @@ fun ShowtimeScreen(movieId: Int,viewModel: MovieViewModel, navController: NavCon
                 .fillMaxSize()
                 .padding(top = 280.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.surface,
+                    color = colorScheme.surface,
                     shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
                 )
                 .padding(horizontal = 20.dp, vertical = 28.dp)
@@ -134,7 +140,7 @@ fun ShowtimeScreen(movieId: Int,viewModel: MovieViewModel, navController: NavCon
                 text = movie.movie_name,
                 fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = colorScheme.onSurface,
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center
             )
@@ -170,7 +176,7 @@ fun ShowtimeScreen(movieId: Int,viewModel: MovieViewModel, navController: NavCon
                     Box(
                         modifier = Modifier
                             .background(
-                                if (date == selectedDate) MaterialTheme.colorScheme.primary else Color.DarkGray,
+                                if (date == selectedDate) colorScheme.primary else Color.DarkGray,
                                 shape = RoundedCornerShape(10.dp)
                             )
                             .clickable { selectedDate = date }
@@ -193,7 +199,7 @@ fun ShowtimeScreen(movieId: Int,viewModel: MovieViewModel, navController: NavCon
                         modifier = Modifier
                             .background(
                                 if (selectedShowtime?.showtimeId == st.showtimeId)
-                                    MaterialTheme.colorScheme.primary
+                                    colorScheme.primary
                                 else Color.Gray,
                                 shape = RoundedCornerShape(10.dp)
                             )
