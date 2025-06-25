@@ -44,6 +44,7 @@
 
 ## 📱 Hướng Dẫn Cài Đặt và Chạy Ứng Dụng
 
+Xem chi tiết ở chương 5 của bài báo cáo dưới đây:  
 📄 [Xem hoặc tải hướng dẫn cài đặt (PDF)](https://drive.google.com/file/d/18G_UNzcmDUnh__75mTAiLqQ0LecKLrcP/view?usp=drive_link)
 
 ---
